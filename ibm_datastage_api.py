@@ -17,16 +17,16 @@ else:
 
 class DSPROJECT(ctypes.Structure):
 	_fields_ = [("dsapiVersionNo", ctypes.c_int),
-				("sessionId", ctypes.c_int),
-				("valueMark", ctypes.c_ubyte),
-				("fieldMark", ctypes.c_ubyte)]
+	            ("sessionId", ctypes.c_int),
+	            ("valueMark", ctypes.c_ubyte),
+	            ("fieldMark", ctypes.c_ubyte)]
 
 class DSJOB(ctypes.Structure):
 	_fields_ = [("hProject",        ctypes.POINTER(DSPROJECT)),
-				("serverJobHandle", ctypes.c_char_p),
-				("logData",         ctypes.c_char_p),
-				("logDataLen",      ctypes.c_int),
-				("logDataPsn",      ctypes.c_int)]
+	            ("serverJobHandle", ctypes.c_char_p),
+	            ("logData",         ctypes.c_char_p),
+	            ("logDataLen",      ctypes.c_int),
+	            ("logDataPsn",      ctypes.c_int)]
 
 class DSJOBINFO_info(ctypes.Union):
 	_fields_ = [("jobStatus",         ctypes.c_int),
@@ -148,11 +148,11 @@ class DSAPI:
 	DSJ_JOBRESTARTABLE    = 24  # Job can be restarted
 
 	# DSPROJECTINFO 'infoType' values
-	DSJ_JOBLIST	    = 1 # List of jobs in project
+	DSJ_JOBLIST     = 1 # List of jobs in project
 	DSJ_PROJECTNAME	= 2 # Name of current project
 	DSJ_HOSTNAME    = 3 # Host name of the server
 	DSJ_INSTALLTAG  = 4 # Install tag of the server DSEngine
-	DSJ_TCPPORT	    = 5 # TCP port    of the server DSEngine
+	DSJ_TCPPORT     = 5 # TCP port    of the server DSEngine
 	DSJ_PROJECTPATH	= 6	# Directory path of current project
 
 	# DSLOGDETAILFULL 'eventType' values
