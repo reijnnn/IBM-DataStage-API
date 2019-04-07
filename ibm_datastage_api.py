@@ -30,85 +30,85 @@ class DSJOB(ctypes.Structure):
 
 class DSJOBINFO_info(ctypes.Union):
 	_fields_ = [("jobStatus",         ctypes.c_int),
-				("jobController",     ctypes.c_char_p),
-				("jobStartTime",      time_t),
-				("jobWaveNumber",     ctypes.c_int),
-				("userStatus",        ctypes.c_char_p),
-				("stageList",         ctypes.c_char_p),
-				("paramList",         ctypes.POINTER(ctypes.c_char)),
-				("jobName",           ctypes.c_char_p),
-				("jobControl",        ctypes.c_int),
-				("jobPid",            ctypes.c_int),
-				("jobLastTime",       time_t),
-				("jobInvocations",    ctypes.POINTER(ctypes.c_char)),
-				("jobInterimStatus",  ctypes.c_int),
-				("jobInvocationId",   ctypes.c_char_p),
-				("jobDesc",           ctypes.c_char_p),
-				("stageList2",        ctypes.c_char_p),
-				("jobElapsed",        ctypes.c_char_p),
-				("jobDMIService",     ctypes.c_int),
-				("jobMultiInvokable", ctypes.c_int),
-				("jobFullDesc",       ctypes.c_char_p),
-				("jobRestartable",    ctypes.c_int)]
+	            ("jobController",     ctypes.c_char_p),
+	            ("jobStartTime",      time_t),
+	            ("jobWaveNumber",     ctypes.c_int),
+	            ("userStatus",        ctypes.c_char_p),
+	            ("stageList",         ctypes.c_char_p),
+	            ("paramList",         ctypes.POINTER(ctypes.c_char)),
+	            ("jobName",           ctypes.c_char_p),
+	            ("jobControl",        ctypes.c_int),
+	            ("jobPid",            ctypes.c_int),
+	            ("jobLastTime",       time_t),
+	            ("jobInvocations",    ctypes.POINTER(ctypes.c_char)),
+	            ("jobInterimStatus",  ctypes.c_int),
+	            ("jobInvocationId",   ctypes.c_char_p),
+	            ("jobDesc",           ctypes.c_char_p),
+	            ("stageList2",        ctypes.c_char_p),
+	            ("jobElapsed",        ctypes.c_char_p),
+	            ("jobDMIService",     ctypes.c_int),
+	            ("jobMultiInvokable", ctypes.c_int),
+	            ("jobFullDesc",       ctypes.c_char_p),
+	            ("jobRestartable",    ctypes.c_int)]
 
 class DSJOBINFO(ctypes.Structure):
 	_fields_ = [("infoType", ctypes.c_int),
-				("info",     DSJOBINFO_info)]
+	            ("info",     DSJOBINFO_info)]
 
 class DSPROJECTINFO_info(ctypes.Union):
 	_fields_ = [("jobList",      ctypes.POINTER(ctypes.c_char)),
-				("projectName",  ctypes.c_char_p),
-				("projectPath",  ctypes.c_char_p),
-				("hostName",     ctypes.c_char_p),
-				("installTag",   ctypes.c_char_p),
-				("tcpPort",      ctypes.c_char_p)]
+	            ("projectName",  ctypes.c_char_p),
+	            ("projectPath",  ctypes.c_char_p),
+	            ("hostName",     ctypes.c_char_p),
+	            ("installTag",   ctypes.c_char_p),
+	            ("tcpPort",      ctypes.c_char_p)]
 
 class DSPROJECTINFO(ctypes.Structure):
 	_fields_ = [("infoType", ctypes.c_int),
-				("info",     DSPROJECTINFO_info)]
+	            ("info",     DSPROJECTINFO_info)]
 
 class DSLOGEVENT(ctypes.Structure):
 	_fields_ = [("eventId",   ctypes.c_int),
-				("timestamp", time_t),
-				("type",      ctypes.c_int),
-				("message",   ctypes.c_char_p)]
+	            ("timestamp", time_t),
+	            ("type",      ctypes.c_int),
+	            ("message",   ctypes.c_char_p)]
 
 class DSLOGDETAILFULL(ctypes.Structure):
 	_fields_ = [("eventId",      ctypes.c_int),
-				("timestamp",    time_t),
-				("type",         ctypes.c_int),
-				("username",     ctypes.c_char_p),
-				("fullMessage",  ctypes.POINTER(ctypes.c_char)),
-				("messageId",    ctypes.c_char_p),
-				("invocationId", ctypes.c_char_p)]
+	            ("timestamp",    time_t),
+	            ("type",         ctypes.c_int),
+	            ("username",     ctypes.c_char_p),
+	            ("fullMessage",  ctypes.POINTER(ctypes.c_char)),
+	            ("messageId",    ctypes.c_char_p),
+	            ("invocationId", ctypes.c_char_p)]
 
 class DSLOGDETAIL(ctypes.Structure):
 	_fields_ = [("eventId",      ctypes.c_int),
-				("timestamp",    time_t),
-				("type",         ctypes.c_int),
-				("username",     ctypes.c_char_p),
-				("fullMessage",  ctypes.POINTER(ctypes.c_char))]
+	            ("timestamp",    time_t),
+	            ("type",         ctypes.c_int),
+	            ("username",     ctypes.c_char_p),
+	            ("fullMessage",  ctypes.POINTER(ctypes.c_char))]
 
 class DSPARAM_value(ctypes.Union):
 	_fields_ = [("pString",    ctypes.c_char_p),
-				("pEncrypt",   ctypes.c_char_p),
-				("pInt",       ctypes.c_int),
-				("pFloat",     ctypes.c_float),
-				("pPath",      ctypes.c_char_p),
-				("pListValue", ctypes.c_char_p),
-				("pDate",      ctypes.c_char_p),
-				("pTime",      ctypes.c_char_p)]
+	            ("pEncrypt",   ctypes.c_char_p),
+	            ("pInt",       ctypes.c_int),
+	            ("pFloat",     ctypes.c_float),
+	            ("pPath",      ctypes.c_char_p),
+	            ("pListValue", ctypes.c_char_p),
+	            ("pDate",      ctypes.c_char_p),
+	            ("pTime",      ctypes.c_char_p)]
 
 class DSPARAM(ctypes.Structure):
 	_fields_ = [("paramType",  ctypes.c_int),
-				("paramValue", DSPARAM_value)]
+	            ("paramValue", DSPARAM_value)]
 
 class DSREPORTINFO_info(ctypes.Union):
 	_fields_ = [("reportText", ctypes.c_char_p)]
 
 class DSREPORTINFO(ctypes.Structure):
 	_fields_ = [("reportType",  ctypes.c_int),
-				("info", DSREPORTINFO_info)]
+	            ("info", DSREPORTINFO_info)]
 
 
 #####################################################
