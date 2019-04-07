@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+
+Examples/config.py
+Examples/*.pyc
+Examples/__pycache__/
