@@ -7,7 +7,7 @@ Please read [DataStage Development Kit](https://www.ibm.com/support/knowledgecen
 
 Create your own config.py with path to DataStage API library (vmdsapi.dll on client or libvmdsapi.so on server) and configure connection's parameters.
 
-See config_example.py
+See Examples/config_example.py
 
 ## Running the program
 
