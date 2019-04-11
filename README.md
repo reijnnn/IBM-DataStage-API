@@ -1,11 +1,15 @@
 # IBM-DataStage-API
 
 IBM-DataStage-API on Python.
-Please read [DataStage Development Kit](https://www.ibm.com/support/knowledgecenter/en/SSZJPZ_11.7.0/com.ibm.swg.im.iis.ds.cliapi.ref.doc/topics/r_dsvjbref_WebSphere_DataStage_Development_Kit.html) to find details.
+Please read [InfoSphere DataStage Development Kit](https://www.ibm.com/support/knowledgecenter/en/SSZJPZ_11.7.0/com.ibm.swg.im.iis.ds.cliapi.ref.doc/topics/r_dsvjbref_WebSphere_DataStage_Development_Kit.html) to find details.
+
+## Requirements
+
+For the correct work `ctypes` with DataStage API library (32-bit or 64-bit) you need python of the same version (32-bit or 64-bit)
 
 ## Getting Started
 
-Create your own config.py with path to DataStage API library (vmdsapi.dll on client or libvmdsapi.so on server) and configure connection's parameters.
+Create your own `config.py` with path to DataStage API library (`vmdsapi.dll` on client or `libvmdsapi.so` on server) and configure connection's parameters.
 
 See Examples/config_example.py
 

@@ -430,7 +430,7 @@ class DSAPI:
 			return None, self.createError("[DSGetNewestLogId]: the job doesn't open")
 
 		self.libapi.DSGetNewestLogId.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int]
-		self.libapi.DSGetNewestLogId.restype = ctypes.c_int
+		self.libapi.DSGetNewestLogId.restype  = ctypes.c_int
 
 		lastLogId = self.libapi.DSGetNewestLogId(handleJob, eventType)
 
@@ -438,7 +438,22 @@ class DSAPI:
 			return None, self.createError("[DSGetNewestLogId]: {}".format(self.DSGetLastError()))
 		else:
 			return lastLogId, None
-
+	
+	def DSGetLogEventIds(self, handleJob, runNumber = 0, filter = ''):
+		if handleJob is None:
+			return None, self.createError("[DSGetLogEventIds]: the job doesn't open")
+		
+		self.libapi.DSGetLogEventIds.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.c_char_p, ctypes.POINTER(ctypes.POINTER(ctypes.c_char))]
+		self.libapi.DSGetLogEventIds.restype  = ctypes.c_int
+		
+		eventsPointer = ctypes.POINTER(ctypes.c_char)()
+		res = self.libapi.DSGetLogEventIds(handleJob, runNumber, self.encodeString(filter), ctypes.pointer(eventsPointer))
+		
+		if res != self.DSJE_NOERROR:
+			return None, self.createError("[DSGetLogEventIds]: {}".format(self.DSGetLastError()))
+		else:
+			return self.charPointerToList(eventsPointer), None
+		
 	def DSGetQueueList(self):
 		self.libapi.DSGetQueueList.restype = ctypes.POINTER(ctypes.c_char)
 		qList = self.libapi.DSGetQueueList()
