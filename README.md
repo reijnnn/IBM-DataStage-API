@@ -5,7 +5,7 @@ Please read [InfoSphere DataStage Development Kit](https://www.ibm.com/support/k
 
 ## Requirements
 
-For the correct work `ctypes` with DataStage API library (32-bit or 64-bit) you need python of the same version (32-bit or 64-bit)
+For the correct work `ctypes` with DataStage API library (32-bit or 64-bit) you need Python of the same version (32-bit or 64-bit)
 
 ## Getting Started
 
