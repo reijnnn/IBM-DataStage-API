@@ -5,7 +5,7 @@ from config import *
 import os, sys
 sys.path.insert(0, os.path.dirname(os.getcwd()))
 
-from ibm_datastage_api import DSAPI
+from ibm_datastage_api import DSAPI, DSPARAM
 
 hproj = None
 hjob  = None
@@ -30,32 +30,31 @@ try:
 	if err:
 		raise Exception("Can't open the job {}: {}".format(DS_JOB_NAME, err))
 
-	print("Getting a list of event log IDs for a last job invocation")
-	res, err = dsapi.DSGetLogEventIds(hjob)
+	print("Getting an information about the job\n")
+	paramList, err = dsapi.DSGetJobInfo(hjob, dsapi.DSJ_PARAMLIST)
 	if err:
-		raise Exception("Can't get a list of event log IDs: {}".format(err))
-	print(res)
+		raise Exception("Can't get the job info: {}".format(err))
+	print("DSJ_PARAMLIST = {}\n".format(paramList))
 
-	print("Getting a list of event log IDs for a previous job invocation")
-	res, err = dsapi.DSGetLogEventIds(hjob, -1)
-	if err:
-		raise Exception("Can't get a list of event log IDs: {}".format(err))
-	print(res)
+	for param in paramList:
+		paramInfo, err = dsapi.DSGetParamInfo(hjob, param)
 
-	print("Getting a list of event log IDs for a previous job invocation. Only Start/End('S') and Fatal('F') events")
-	"""
-	I - Informational
-	W - Warning
-	F - Fatal
-	S - Start or End events
-	B - Batch or Control events
-	R - Purge or reset events
-	J - Reject events
-	"""
-	res, err = dsapi.DSGetLogEventIds(hjob, -1, 'SF')
-	if err:
-		raise Exception("Can't get a list of event log IDs: {}".format(err))
-	print(res)
+		print("paramName:   '{}'".format(param))
+		if err:
+			raise Exception("Can't get the parameter info: {}".format(err))
+
+		print("helpText:     {}".format(paramInfo.helpText))
+		print("paramPrompt:  {}".format(paramInfo.paramPrompt))
+		print("paramType:    {}".format(paramInfo.paramType))
+
+		if paramInfo.paramType == dsapi.DSJ_PARAMTYPE_STRING:
+			print("defaultValue: {}\n".format(paramInfo.defaultValue.paramValue.pString))
+		elif paramInfo.paramType == dsapi.DSJ_PARAMTYPE_ENCRYPTED:
+			print("defaultValue: {}\n".format(paramInfo.defaultValue.paramValue.pEncrypt))
+		elif paramInfo.paramType == dsapi.DSJ_PARAMTYPE_INTEGER:
+			print("defaultValue: {}\n".format(paramInfo.defaultValue.paramValue.pInt))
+		else:
+			print("\n")
 
 	print("Closing the job")
 	dsapi.DSCloseJob(hjob)
@@ -84,5 +83,5 @@ except Exception as e:
 		hproj = None
 
 	dsapi.DSUnloadLibrary()
-
+	
 print("Exit.")

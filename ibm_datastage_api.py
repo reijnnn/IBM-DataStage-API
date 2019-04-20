@@ -103,6 +103,16 @@ class DSPARAM(ctypes.Structure):
 	_fields_ = [("paramType",  ctypes.c_int),
 	            ("paramValue", DSPARAM_value)]
 
+class DSPARAMINFO(ctypes.Structure):
+	_fields_ = [("defaultValue",    DSPARAM),
+	            ("helpText",        ctypes.c_char_p),
+	            ("paramPrompt",     ctypes.c_char_p),
+	            ("paramType",       ctypes.c_int),
+	            ("desDefaultValue", DSPARAM),
+	            ("listValues",      ctypes.c_char_p),
+	            ("desListValues",   ctypes.c_char_p),
+	            ("promptAtRun",     ctypes.c_int)]
+
 class DSREPORTINFO_info(ctypes.Union):
 	_fields_ = [("reportText", ctypes.c_char_p)]
 
@@ -111,19 +121,19 @@ class DSREPORTINFO(ctypes.Structure):
 	            ("info", DSREPORTINFO_info)]
 
 class DSREPOSUSAGEJOB(ctypes.Structure):
-	pass 
+	pass
 DSREPOSUSAGEJOB._fields_ = [("jobname",  ctypes.c_char_p),
                             ("jobtype",  ctypes.c_int),
                             ("nextjob",  ctypes.POINTER(DSREPOSUSAGEJOB)),
                             ("childjob", ctypes.POINTER(DSREPOSUSAGEJOB))]
-				
+
 class DSREPOSUSAGE_info(ctypes.Union):
 	_fields_ = [("jobs", ctypes.POINTER(DSREPOSUSAGEJOB))]
 
 class DSREPOSUSAGE(ctypes.Structure):
 	_fields_ = [("infoType", ctypes.c_int),
 	            ("info",     DSREPOSUSAGE_info)]
-				
+
 #####################################################
 ###                 API INTERFACE                 ###
 #####################################################
@@ -194,22 +204,22 @@ class DSAPI:
 	DSJ_PARAMTYPE_LIST      = 5
 	DSJ_PARAMTYPE_DATE      = 6
 	DSJ_PARAMTYPE_TIME      = 7
-	
+
 	# DSREPOSUSAGEJOB 'relationshipType' values
 	DSS_JOB_USES_JOB                   = 1
 	DSS_JOB_USEDBY_JOB                 = 2
 	DSS_JOB_HASSOURCE_TABLEDEF         = 3
 	DSS_JOB_HASTARGET_TABLEDEF         = 4
 	DSS_JOB_HASSOURCEORTARGET_TABLEDEF = 5
-	
-	# DSREPOSINFO 'infoType' values 
-	DSS_JOBS          = 1  # The Object Type to return 
-	DSS_JOB_ALL       = 15 # list all jobs 
-	DSS_JOB_SERVER    = 1  # list all server jobs 
-	DSS_JOB_PARALLEL  = 2  # list all parallel jobs 
-	DSS_JOB_MAINFRAME = 4  # list all mainframe jobs 
-	DSS_JOB_SEQUENCE  = 8  # list all sequence jobs 	
-	
+
+	# DSREPOSINFO 'infoType' values
+	DSS_JOBS          = 1  # The Object Type to return
+	DSS_JOB_ALL       = 15 # list all jobs
+	DSS_JOB_SERVER    = 1  # list all server jobs
+	DSS_JOB_PARALLEL  = 2  # list all parallel jobs
+	DSS_JOB_MAINFRAME = 4  # list all mainframe jobs
+	DSS_JOB_SEQUENCE  = 8  # list all sequence jobs
+
 	def __init__(self):
 		self.libapi 	= None
 		self.handleProj = None
@@ -217,10 +227,10 @@ class DSAPI:
 	#####################################################
 	###                API FUNCTIONS                  ###
 	#####################################################
-	def DSSetServerParams(self, DomainName, UserName, Password, ServerName):
+	def DSSetServerParams(self, domainName, userName, password, serverName):
 		self.libapi.DSSetServerParams.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
 		self.libapi.DSSetServerParams.restype  = ctypes.c_void_p
-		self.libapi.DSSetServerParams(self.encodeString(DomainName), self.encodeString(UserName), self.encodeString(Password), self.encodeString(ServerName))
+		self.libapi.DSSetServerParams(self.encodeString(domainName), self.encodeString(userName), self.encodeString(password), self.encodeString(serverName))
 
 		return True, None
 
@@ -248,7 +258,7 @@ class DSAPI:
 	def DSGetProjectInfo(self, handleProj, infoType):
 		if handleProj is None:
 			return None, self.createError("[DSGetProjectInfo]: the project doesn't open")
-			
+
 		if infoType < self.DSJ_JOBLIST or infoType > self.DSJ_PROJECTPATH:
 			return None, self.createError("[DSGetProjectInfo]: infotype = {} doesn't exsist".format(infoType))
 
@@ -438,22 +448,22 @@ class DSAPI:
 			return None, self.createError("[DSGetNewestLogId]: {}".format(self.DSGetLastError()))
 		else:
 			return lastLogId, None
-	
+
 	def DSGetLogEventIds(self, handleJob, runNumber = 0, filter = ''):
 		if handleJob is None:
 			return None, self.createError("[DSGetLogEventIds]: the job doesn't open")
-		
+
 		self.libapi.DSGetLogEventIds.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.c_char_p, ctypes.POINTER(ctypes.POINTER(ctypes.c_char))]
 		self.libapi.DSGetLogEventIds.restype  = ctypes.c_int
-		
+
 		eventsPointer = ctypes.POINTER(ctypes.c_char)()
 		res = self.libapi.DSGetLogEventIds(handleJob, runNumber, self.encodeString(filter), ctypes.pointer(eventsPointer))
-		
+
 		if res != self.DSJE_NOERROR:
 			return None, self.createError("[DSGetLogEventIds]: {}".format(self.DSGetLastError()))
 		else:
 			return self.charPointerToList(eventsPointer), None
-		
+
 	def DSGetQueueList(self):
 		self.libapi.DSGetQueueList.restype = ctypes.POINTER(ctypes.c_char)
 		qList = self.libapi.DSGetQueueList()
@@ -477,7 +487,7 @@ class DSAPI:
 	def DSCloseJob(self, handleJob):
 		if handleJob is None:
 			return None, self.createError("[DSCloseJob]: the job doesn't open")
-			
+
 		self.libapi.DSCloseJob.argtypes = [ctypes.POINTER(DSJOB)]
 		self.libapi.DSCloseJob.restype  = ctypes.c_int
 
@@ -491,7 +501,7 @@ class DSAPI:
 	def DSCloseProject(self, handleProj):
 		if handleProj is None:
 			return None, self.createError("[DSCloseProject]: the project doesn't open")
-			
+
 		self.libapi.DSCloseProject.argtypes = [ctypes.POINTER(DSPROJECT)]
 		self.libapi.DSCloseProject.restype  = ctypes.c_int
 
@@ -516,11 +526,11 @@ class DSAPI:
 			return None, self.createError("[DSRunJob]: {}".format(self.DSGetLastError()))
 		else:
 			return 0, None
-	
+
 	def DSStopJob(self, handleJob):
 		if handleJob is None:
 			return None, self.createError("[DSStopJob]: the job doesn't open")
-			
+
 		self.libapi.DSStopJob.argtypes = [ctypes.POINTER(DSJOB)]
 		self.libapi.DSStopJob.restype  = ctypes.c_int
 
@@ -530,7 +540,7 @@ class DSAPI:
 			return None, self.createError("[DSStopJob]: {}".format(self.DSGetLastError()))
 		else:
 			return 0, None
-	
+
 	def DSLockJob(self, handleJob):
 		if handleJob is None:
 			return None, self.createError("[DSLockJob]: the job doesn't open")
@@ -573,19 +583,34 @@ class DSAPI:
 		else:
 			return 0, None
 
-	def DSSetParam(self, handleJob, ParamName, Param):
+	def DSSetParam(self, handleJob, paramName, param):
 		if handleJob is None:
 			return None, self.createError("[DSSetParam]: the job doesn't open")
 
 		self.libapi.DSSetParam.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_char_p, ctypes.POINTER(DSPARAM)]
 		self.libapi.DSSetParam.restype  = ctypes.c_int
 
-		res = self.libapi.DSSetParam(handleJob, ParamName, ctypes.pointer(Param))
+		res = self.libapi.DSSetParam(handleJob, paramName, ctypes.pointer(param))
 
 		if res != self.DSJE_NOERROR:
 			return None, self.createError("[DSSetParam]: {}".format(self.DSGetLastError()))
 		else:
 			return 0, None
+
+	def DSGetParamInfo(self, handleJob, paramName):
+		if handleJob is None:
+			return None, self.createError("[DSGetParamInfo]: the job doesn't open")
+
+		self.libapi.DSGetParamInfo.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_char_p, ctypes.POINTER(DSPARAMINFO)]
+		self.libapi.DSGetParamInfo.restype  = ctypes.c_int
+
+		paramInfo = DSPARAMINFO()
+		res = self.libapi.DSGetParamInfo(handleJob, self.encodeString(paramName), ctypes.pointer(paramInfo))
+
+		if res != self.DSJE_NOERROR:
+			return None, self.createError("[DSGetParamInfo]: {}".format(self.DSGetLastError()))
+		else:
+			return paramInfo, None
 
 	def DSMakeJobReport(self, handleJob, reportType, lineSeparator='CRLF'):
 		if handleJob is None:
@@ -601,24 +626,41 @@ class DSAPI:
 			return None, self.createError("[DSMakeJobReport]: {}".format(self.DSGetLastError()))
 		else:
 			return reportInfo.info.reportText, None
-	
+
 	def DSGetReposUsage(self, handleProj, relationshipType, objectName, recursive = 0):
 		if handleProj is None:
 			return None, self.createError("[DSGetReposUsage]: the project doesn't open")
-		
+
 		self.libapi.DSGetReposUsage.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(DSREPOSUSAGE)]
 		self.libapi.DSGetReposUsage.restype  = ctypes.c_int
-		
+
 		reposInfo = DSREPOSUSAGE()
 		res = self.libapi.DSGetReposUsage(handleProj, relationshipType, self.encodeString(objectName), recursive, ctypes.pointer(reposInfo))
-		
+
 		if res < 0:
 			return None, self.createError("[DSGetReposUsage]: {}".format(self.DSGetLastError()))
 		if res == 0:
 			return None, None
-			
+
 		return reposInfo.info.jobs.contents, None
-		
+
+	def DSLogEvent(self, handleJob, eventType, message):
+		if handleJob is None:
+			return None, self.createError("[DSLogEvent]: the job doesn't open")
+
+		if eventType < self.DSJ_LOGINFO or eventType > self.DSJ_LOGWARNING:
+			return None, self.createError("[DSLogEvent]: eventType = {} doesn't exsist".format(eventType))
+
+		self.libapi.DSLogEvent.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.c_char_p, ctypes.c_char_p]
+		self.libapi.DSLogEvent.restype  = ctypes.c_int
+
+		res = self.libapi.DSLogEvent(handleJob, eventType, self.encodeString(''), self.encodeString(message))
+
+		if res != self.DSJE_NOERROR:
+			return None, self.createError("[DSLogEvent]: {}".format(self.DSGetLastError()))
+		else:
+			return 0, None
+
 	#####################################################
 	###              CUSTOM FUNCTIONS                 ###
 	#####################################################
