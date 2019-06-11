@@ -220,6 +220,10 @@ class DSAPI:
 	DSS_JOB_MAINFRAME = 4  # list all mainframe jobs
 	DSS_JOB_SEQUENCE  = 8  # list all sequence jobs
 
+	# ENVVAR 'varType' values
+	DSA_ENVVAR_TYPE_STRING    = 'String'
+	DSA_ENVVAR_TYPE_ENCRYPTED = 'Encrypted'
+
 	def __init__(self):
 		self.libapi 	= None
 		self.handleProj = None
@@ -660,6 +664,62 @@ class DSAPI:
 			return None, self.createError("[DSLogEvent]: {}".format(self.DSGetLastError()))
 		else:
 			return 0, None
+
+	def DSAddEnvVar(self, handleProj, envVarName, varType, promptText, value):
+		if handleProj is None:
+			return None, self.createError("[DSAddEnvVar]: the project doesn't open")
+
+		self.libapi.DSAddEnvVar.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+		self.libapi.DSAddEnvVar.restype  = ctypes.c_int
+
+		res = self.libapi.DSAddEnvVar(handleProj, self.encodeString(envVarName), self.encodeString(varType), self.encodeString(promptText), self.encodeString(value))
+
+		if res != self.DSJE_NOERROR:
+			return None, self.createError("[DSAddEnvVar]: {}".format(res))
+		else:
+			return 0, None
+
+	def DSDeleteEnvVar(self, handleProj, envVarName):
+		if handleProj is None:
+			return None, self.createError("[DSDeleteEnvVar]: the project doesn't open")
+
+		self.libapi.DSDeleteEnvVar.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p]
+		self.libapi.DSDeleteEnvVar.restype  = ctypes.c_int
+
+		res = self.libapi.DSDeleteEnvVar(handleProj, self.encodeString(envVarName))
+
+		if res != self.DSJE_NOERROR:
+			return None, self.createError("[DSDeleteEnvVar]: {}".format(res))
+		else:
+			return 0, None
+
+	def DSSetEnvVar(self, handleProj, envVarName, value):
+		if handleProj is None:
+			return None, self.createError("[DSSetEnvVar]: the project doesn't open")
+
+		self.libapi.DSSetEnvVar.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p, ctypes.c_char_p]
+		self.libapi.DSSetEnvVar.restype  = ctypes.c_int
+
+		res = self.libapi.DSSetEnvVar(handleProj, self.encodeString(envVarName), self.encodeString(value))
+
+		if res != self.DSJE_NOERROR:
+			return None, self.createError("[DSSetEnvVar]: {}".format(res))
+		else:
+			return 0, None
+
+	def DSListEnvVars(self, handleProj):
+		if handleProj is None:
+			return None, self.createError("[DSListEnvVars]: the project doesn't open")
+
+		self.libapi.DSListEnvVars.argtypes = [ctypes.POINTER(DSPROJECT)]
+		self.libapi.DSListEnvVars.restype  = ctypes.POINTER(ctypes.c_char)
+
+		varList = self.libapi.DSListEnvVars(handleProj)
+
+		if not varList:
+			return None, self.createError("[DSListEnvVars]: {}".format(self.DSGetLastError()))
+		else:
+			return self.charPointerToList(varList), None
 
 	#####################################################
 	###              CUSTOM FUNCTIONS                 ###
