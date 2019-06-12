@@ -143,7 +143,7 @@ class DSAPI:
 	DSAPI_VERSION = 1
 
 	# API Error Codes
-	DSJE_NOERROR = 0;
+	DSJE_NOERROR = 0
 
 	# DSJOBINFO 'infoType' values
 	DSJ_JOBSTATUS         = 1  # Current status of the job.
@@ -234,6 +234,7 @@ class DSAPI:
 	def DSSetServerParams(self, domainName, userName, password, serverName):
 		self.libapi.DSSetServerParams.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
 		self.libapi.DSSetServerParams.restype  = ctypes.c_void_p
+
 		self.libapi.DSSetServerParams(self.encodeString(domainName), self.encodeString(userName), self.encodeString(password), self.encodeString(serverName))
 
 		return True, None
@@ -241,6 +242,7 @@ class DSAPI:
 	def DSGetProjectList(self):
 		self.libapi.DSGetProjectList.argtypes = []
 		self.libapi.DSGetProjectList.restype  = ctypes.POINTER(ctypes.c_char)
+
 		projectList = self.libapi.DSGetProjectList()
 
 		if not projectList:
@@ -251,6 +253,7 @@ class DSAPI:
 	def DSOpenProject(self, projectName):
 		self.libapi.DSOpenProjectEx.argtypes = [ctypes.c_int, ctypes.c_char_p]
 		self.libapi.DSOpenProjectEx.restype  = ctypes.POINTER(DSPROJECT)
+
 		handleProj = self.libapi.DSOpenProjectEx(self.DSAPI_VERSION, self.encodeString(projectName))
 
 		if not handleProj:
@@ -260,12 +263,6 @@ class DSAPI:
 			return handleProj, None
 
 	def DSGetProjectInfo(self, handleProj, infoType):
-		if handleProj is None:
-			return None, self.createError("[DSGetProjectInfo]: the project doesn't open")
-
-		if infoType < self.DSJ_JOBLIST or infoType > self.DSJ_PROJECTPATH:
-			return None, self.createError("[DSGetProjectInfo]: infotype = {} doesn't exsist".format(infoType))
-
 		self.libapi.DSGetProjectInfo.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_int, ctypes.POINTER(DSPROJECTINFO)]
 		self.libapi.DSGetProjectInfo.restype  = ctypes.c_int
 
@@ -273,7 +270,7 @@ class DSAPI:
 		res = self.libapi.DSGetProjectInfo(handleProj, infoType, ctypes.pointer(projInfo))
 
 		if res != self.DSJE_NOERROR:
-			return None, res
+			return None, self.createError("[DSGetProjectInfo]: {}".format(self.DSGetLastError()))
 
 		if infoType == self.DSJ_JOBLIST:
 			return self.charPointerToList(projInfo.info.jobList), None
@@ -302,11 +299,9 @@ class DSAPI:
 			return str(self.libapi.DSGetLastError())
 
 	def DSOpenJob(self, handleProj, jobName):
-		if handleProj is None:
-			return None, self.createError("[DSOpenJob]: the project doesn't open")
-
 		self.libapi.DSOpenJob.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p]
 		self.libapi.DSOpenJob.restype  = ctypes.POINTER(DSJOB)
+
 		handleJob = self.libapi.DSOpenJob(handleProj, ctypes.c_char_p(self.encodeString(jobName)))
 
 		if not handleJob:
@@ -316,12 +311,6 @@ class DSAPI:
 			return handleJob, None
 
 	def DSGetJobInfo(self, handleJob, infoType):
-		if handleJob is None:
-			return None, self.createError("[DSGetJobInfo]: the job doesn't open")
-
-		if infoType < self.DSJ_JOBSTATUS or infoType > self.DSJ_JOBRESTARTABLE:
-			return None, self.createError("[DSGetJobInfo]: infotype = {} doesn't exsist".format(infoType))
-
 		self.libapi.DSGetJobInfo.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.POINTER(DSJOBINFO)]
 		self.libapi.DSGetJobInfo.restype  = ctypes.c_int
 
@@ -377,12 +366,6 @@ class DSAPI:
 				return '', None
 
 	def DSFindFirstLogEntry(self, handleJob, eventType = DSJ_LOGANY, startTime = 0, endTime = 0, maxNumber = 250):
-		if handleJob is None:
-			return None, self.createError("[DSFindFirstLogEntry]: the job doesn't open")
-
-		if eventType < self.DSJ_LOGINFO or eventType > self.DSJ_LOGANY:
-			return None, self.createError("[DSFindFirstLogEntry]: eventtype = {} doesn't exsist".format(eventType))
-
 		self.libapi.DSFindFirstLogEntry.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, time_t, time_t, ctypes.c_int, ctypes.POINTER(DSLOGEVENT)]
 		self.libapi.DSFindFirstLogEntry.restype  = ctypes.c_int
 
@@ -395,9 +378,6 @@ class DSAPI:
 			return logInfo, None
 
 	def DSFindNextLogEntry(self, handleJob):
-		if handleJob is None:
-			return None, self.createError("[DSFindNextLogEntry]: the job doesn't open")
-
 		self.libapi.DSFindNextLogEntry.argtypes = [ctypes.POINTER(DSJOB), ctypes.POINTER(DSLOGEVENT)]
 		self.libapi.DSFindNextLogEntry.restype = ctypes.c_int
 
@@ -410,9 +390,6 @@ class DSAPI:
 			return logEvent, None
 
 	def DSGetLogEntryFull(self, handleJob, eventId):
-		if handleJob is None:
-			return None, self.createError("[DSGetLogEntryFull]: the job doesn't open")
-
 		self.libapi.DSGetLogEntryFull.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.POINTER(DSLOGDETAILFULL)]
 		self.libapi.DSGetLogEntryFull.restype  = ctypes.c_int
 
@@ -425,9 +402,6 @@ class DSAPI:
 			return logDetail, None
 
 	def DSGetLogEntry(self, handleJob, eventId):
-		if handleJob is None:
-			return None, self.createError("[DSGetLogEntry]: the job doesn't open")
-
 		self.libapi.DSGetLogEntry.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.POINTER(DSLOGDETAIL)]
 		self.libapi.DSGetLogEntry.restype  = ctypes.c_int
 
@@ -440,9 +414,6 @@ class DSAPI:
 			return logDetail, None
 
 	def DSGetNewestLogId(self, handleJob, eventType):
-		if handleJob is None:
-			return None, self.createError("[DSGetNewestLogId]: the job doesn't open")
-
 		self.libapi.DSGetNewestLogId.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int]
 		self.libapi.DSGetNewestLogId.restype  = ctypes.c_int
 
@@ -454,9 +425,6 @@ class DSAPI:
 			return lastLogId, None
 
 	def DSGetLogEventIds(self, handleJob, runNumber = 0, filter = ''):
-		if handleJob is None:
-			return None, self.createError("[DSGetLogEventIds]: the job doesn't open")
-
 		self.libapi.DSGetLogEventIds.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.c_char_p, ctypes.POINTER(ctypes.POINTER(ctypes.c_char))]
 		self.libapi.DSGetLogEventIds.restype  = ctypes.c_int
 
@@ -475,9 +443,6 @@ class DSAPI:
 		return self.charPointerToList(qList), None
 
 	def DSSetJobQueue(self, handleJob, queueName):
-		if handleJob is None:
-			return None, self.createError("[DSSetJobQueue]: the job doesn't open")
-
 		self.libapi.DSSetJobQueue.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_char_p]
 		self.libapi.DSSetJobQueue.restype  = ctypes.c_int
 
@@ -489,9 +454,6 @@ class DSAPI:
 			return 0, None
 
 	def DSCloseJob(self, handleJob):
-		if handleJob is None:
-			return None, self.createError("[DSCloseJob]: the job doesn't open")
-
 		self.libapi.DSCloseJob.argtypes = [ctypes.POINTER(DSJOB)]
 		self.libapi.DSCloseJob.restype  = ctypes.c_int
 
@@ -503,9 +465,6 @@ class DSAPI:
 			return 0, None
 
 	def DSCloseProject(self, handleProj):
-		if handleProj is None:
-			return None, self.createError("[DSCloseProject]: the project doesn't open")
-
 		self.libapi.DSCloseProject.argtypes = [ctypes.POINTER(DSPROJECT)]
 		self.libapi.DSCloseProject.restype  = ctypes.c_int
 
@@ -518,9 +477,6 @@ class DSAPI:
 			return 0, None
 
 	def DSRunJob(self, handleJob, runMode):
-		if handleJob is None:
-			return None, self.createError("[DSRunJob]: the job doesn't open")
-
 		self.libapi.DSRunJob.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int]
 		self.libapi.DSRunJob.restype  = ctypes.c_int
 
@@ -532,9 +488,6 @@ class DSAPI:
 			return 0, None
 
 	def DSStopJob(self, handleJob):
-		if handleJob is None:
-			return None, self.createError("[DSStopJob]: the job doesn't open")
-
 		self.libapi.DSStopJob.argtypes = [ctypes.POINTER(DSJOB)]
 		self.libapi.DSStopJob.restype  = ctypes.c_int
 
@@ -546,9 +499,6 @@ class DSAPI:
 			return 0, None
 
 	def DSLockJob(self, handleJob):
-		if handleJob is None:
-			return None, self.createError("[DSLockJob]: the job doesn't open")
-
 		self.libapi.DSLockJob.argtypes = [ctypes.POINTER(DSJOB)]
 		self.libapi.DSLockJob.restype  = ctypes.c_int
 
@@ -560,9 +510,6 @@ class DSAPI:
 			return 0, None
 
 	def DSUnlockJob(self, handleJob):
-		if handleJob is None:
-			return None, self.createError("[DSUnlockJob]: the job doesn't open")
-
 		self.libapi.DSUnlockJob.argtypes = [ctypes.POINTER(DSJOB)]
 		self.libapi.DSUnlockJob.restype  = ctypes.c_int
 
@@ -574,9 +521,6 @@ class DSAPI:
 			return 0, None
 
 	def DSWaitForJob(self, handleJob):
-		if handleJob is None:
-			return None, self.createError("[DSWaitForJob]: the job doesn't open")
-
 		self.libapi.DSWaitForJob.argtypes = [ctypes.POINTER(DSJOB)]
 		self.libapi.DSWaitForJob.restype  = ctypes.c_int
 
@@ -588,9 +532,6 @@ class DSAPI:
 			return 0, None
 
 	def DSSetParam(self, handleJob, paramName, param):
-		if handleJob is None:
-			return None, self.createError("[DSSetParam]: the job doesn't open")
-
 		self.libapi.DSSetParam.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_char_p, ctypes.POINTER(DSPARAM)]
 		self.libapi.DSSetParam.restype  = ctypes.c_int
 
@@ -602,9 +543,6 @@ class DSAPI:
 			return 0, None
 
 	def DSGetParamInfo(self, handleJob, paramName):
-		if handleJob is None:
-			return None, self.createError("[DSGetParamInfo]: the job doesn't open")
-
 		self.libapi.DSGetParamInfo.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_char_p, ctypes.POINTER(DSPARAMINFO)]
 		self.libapi.DSGetParamInfo.restype  = ctypes.c_int
 
@@ -617,9 +555,6 @@ class DSAPI:
 			return paramInfo, None
 
 	def DSMakeJobReport(self, handleJob, reportType, lineSeparator='CRLF'):
-		if handleJob is None:
-			return None, self.createError("[DSMakeJobReport]: the job doesn't open")
-
 		self.libapi.DSMakeJobReport.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.c_char_p, ctypes.POINTER(DSREPORTINFO)]
 		self.libapi.DSMakeJobReport.restype  = ctypes.c_int
 
@@ -632,9 +567,6 @@ class DSAPI:
 			return reportInfo.info.reportText, None
 
 	def DSGetReposUsage(self, handleProj, relationshipType, objectName, recursive = 0):
-		if handleProj is None:
-			return None, self.createError("[DSGetReposUsage]: the project doesn't open")
-
 		self.libapi.DSGetReposUsage.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(DSREPOSUSAGE)]
 		self.libapi.DSGetReposUsage.restype  = ctypes.c_int
 
@@ -649,12 +581,6 @@ class DSAPI:
 		return reposInfo.info.jobs.contents, None
 
 	def DSLogEvent(self, handleJob, eventType, message):
-		if handleJob is None:
-			return None, self.createError("[DSLogEvent]: the job doesn't open")
-
-		if eventType < self.DSJ_LOGINFO or eventType > self.DSJ_LOGWARNING:
-			return None, self.createError("[DSLogEvent]: eventType = {} doesn't exsist".format(eventType))
-
 		self.libapi.DSLogEvent.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.c_char_p, ctypes.c_char_p]
 		self.libapi.DSLogEvent.restype  = ctypes.c_int
 
@@ -666,51 +592,39 @@ class DSAPI:
 			return 0, None
 
 	def DSAddEnvVar(self, handleProj, envVarName, varType, promptText, value):
-		if handleProj is None:
-			return None, self.createError("[DSAddEnvVar]: the project doesn't open")
-
 		self.libapi.DSAddEnvVar.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
 		self.libapi.DSAddEnvVar.restype  = ctypes.c_int
 
 		res = self.libapi.DSAddEnvVar(handleProj, self.encodeString(envVarName), self.encodeString(varType), self.encodeString(promptText), self.encodeString(value))
 
 		if res != self.DSJE_NOERROR:
-			return None, self.createError("[DSAddEnvVar]: {}".format(res))
+			return None, self.createError("[DSAddEnvVar]: {}".format(self.DSGetLastError()))
 		else:
 			return 0, None
 
 	def DSDeleteEnvVar(self, handleProj, envVarName):
-		if handleProj is None:
-			return None, self.createError("[DSDeleteEnvVar]: the project doesn't open")
-
 		self.libapi.DSDeleteEnvVar.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p]
 		self.libapi.DSDeleteEnvVar.restype  = ctypes.c_int
 
 		res = self.libapi.DSDeleteEnvVar(handleProj, self.encodeString(envVarName))
 
 		if res != self.DSJE_NOERROR:
-			return None, self.createError("[DSDeleteEnvVar]: {}".format(res))
+			return None, self.createError("[DSDeleteEnvVar]: {}".format(self.DSGetLastError()))
 		else:
 			return 0, None
 
 	def DSSetEnvVar(self, handleProj, envVarName, value):
-		if handleProj is None:
-			return None, self.createError("[DSSetEnvVar]: the project doesn't open")
-
 		self.libapi.DSSetEnvVar.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p, ctypes.c_char_p]
 		self.libapi.DSSetEnvVar.restype  = ctypes.c_int
 
 		res = self.libapi.DSSetEnvVar(handleProj, self.encodeString(envVarName), self.encodeString(value))
 
 		if res != self.DSJE_NOERROR:
-			return None, self.createError("[DSSetEnvVar]: {}".format(res))
+			return None, self.createError("[DSSetEnvVar]: {}".format(self.DSGetLastError()))
 		else:
 			return 0, None
 
 	def DSListEnvVars(self, handleProj):
-		if handleProj is None:
-			return None, self.createError("[DSListEnvVars]: the project doesn't open")
-
 		self.libapi.DSListEnvVars.argtypes = [ctypes.POINTER(DSPROJECT)]
 		self.libapi.DSListEnvVars.restype  = ctypes.POINTER(ctypes.c_char)
 
@@ -740,7 +654,7 @@ class DSAPI:
 		"""
 
 		if not os.path.exists(api_lib_file) or not os.path.isfile(api_lib_file):
-			return None, self.createError("[DSLoadLibrary]: path to {} doesn't exsist".format(api_lib_file))
+			return None, self.createError("[DSLoadLibrary]: path to {} doesn't exist".format(api_lib_file))
 
 		try:
 			self.libapi = ctypes.CDLL(api_lib_file)
