@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import sys
+sys.path.append('..')
+
 from config import *
-
-import os, sys
-sys.path.insert(0, os.path.dirname(os.getcwd()))
-
-from ibm_datastage_api import DSAPI, DSPARAM
+from ibm_datastage_api import DSAPI
 
 hproj = None
 hjob  = None
@@ -83,5 +82,5 @@ except Exception as e:
 		hproj = None
 
 	dsapi.DSUnloadLibrary()
-	
+
 print("Exit.")

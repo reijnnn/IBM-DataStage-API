@@ -28,11 +28,10 @@ def print_job_dependencies(job_name, level = 0):
 	for job in jobs_list:
 		print_job_dependencies(job, level + 1)
 
+import sys
+sys.path.append('..')
+
 from config import *
-
-import os, sys
-sys.path.insert(0, os.path.dirname(os.getcwd()))
-
 from ibm_datastage_api import DSAPI
 
 hproj = None

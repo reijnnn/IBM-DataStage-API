@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import sys
+sys.path.append('..')
+
 from config import *
-
-import os, sys
-sys.path.insert(0, os.path.dirname(os.getcwd()))
-
 from ibm_datastage_api import DSAPI, DSPARAM
 
 hproj = None
