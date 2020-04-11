@@ -118,7 +118,7 @@ class DSREPORTINFO_info(ctypes.Union):
 
 class DSREPORTINFO(ctypes.Structure):
    _fields_ = [("reportType",  ctypes.c_int),
-               ("info", DSREPORTINFO_info)]
+               ("info",        DSREPORTINFO_info)]
 
 class DSREPOSUSAGEJOB(ctypes.Structure):
    pass
@@ -223,6 +223,10 @@ class DSAPI:
    # ENVVAR 'varType' values
    DSA_ENVVAR_TYPE_STRING    = 'String'
    DSA_ENVVAR_TYPE_ENCRYPTED = 'Encrypted'
+
+   # DSSetJobLimit 'limitType' values
+   DSJ_LIMITWARN = 1 # Job to be stopped after LimitValue warning events
+   DSJ_LIMITROWS = 2 # Stages to be limited to LimitValue rows
 
    def __init__(self):
       self.libapi     = None
@@ -473,6 +477,28 @@ class DSAPI:
 
       if res != self.DSJE_NOERROR:
          return None, self.createError("[DSCloseProject]: {}".format(self.DSGetLastError()))
+      else:
+         return 0, None
+
+   def DSSetJobLimit(self, handleJob, limitType, limitValue):
+      self.libapi.DSSetJobLimit.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.c_int]
+      self.libapi.DSSetJobLimit.restype  = ctypes.c_int
+
+      res = self.libapi.DSSetJobLimit(handleJob, limitType, limitValue)
+
+      if res != self.DSJE_NOERROR:
+         return None, self.createError("[DSSetJobLimit]: {}".format(self.DSGetLastError()))
+      else:
+         return 0, None
+
+   def DSPurgeJob(self, handleJob, purgeSpec):
+      self.libapi.DSPurgeJob.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int]
+      self.libapi.DSPurgeJob.restype  = ctypes.c_int
+
+      res = self.libapi.DSPurgeJob(handleJob, purgeSpec)
+
+      if res != self.DSJE_NOERROR:
+         return None, self.createError("[DSPurgeJob]: {}".format(self.DSGetLastError()))
       else:
          return 0, None
 
