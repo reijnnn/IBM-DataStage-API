@@ -7,6 +7,12 @@ Please read [InfoSphere DataStage Development Kit](https://www.ibm.com/support/k
 
 For the correct work `ctypes` with DataStage API library (32-bit or 64-bit) you need Python of the same version (32-bit or 64-bit)
 
+`PATH` on windows should include path where file `vmdsapi.dll` is located.  
+In most cases, in the `../IBM/InformationServer/Clients/Classic/`
+
+`LD_LIBRARY_PATH` on *nix should include path where file `libvmdsapi.so` and its dependences are located.  
+In most cases, in the `../IBM/InformationServer/Server/DSEngine/lib/`
+
 ## Getting Started
 
 Create your own `config.py` with path to DataStage API library (`vmdsapi.dll` on client or `libvmdsapi.so` on server) and configure connection's parameters.

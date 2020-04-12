@@ -668,15 +668,15 @@ class DSAPI:
    def DSLoadLibrary(self, api_lib_file):
       """
       api_lib_file - full path to DataStage API library
-         vmdsapi.dll on WIN
+         vmdsapi.dll on windows
          or
-         libvmdsapi.so on HP-UX
+         libvmdsapi.so on *nix
 
-      PATH on WIN should include paths
-         where located files: ['vmdsapi.dll', 'dsrpc32.dll', 'DSCLNT32.DLL']
+      PATH on windows should include path where file 'vmdsapi.dll' is located
+         in most cases, in the '../IBM/InformationServer/Clients/Classic/'
 
-      LD_LIBRARY_PATH on HP-UX should include paths
-         where located files: ['libvmdsapi.so', 'libinvocation_cpp.so'] and its dependences
+      LD_LIBRARY_PATH on *nix should include path where file 'libvmdsapi.so' and its dependencies are located
+         in most cases, in the '../IBM/InformationServer/Server/DSEngine/lib/'
       """
 
       if not os.path.exists(api_lib_file) or not os.path.isfile(api_lib_file):
@@ -690,7 +690,7 @@ class DSAPI:
       return True, None
 
    def DSUnloadLibrary(self):
-      self.libapi    = None
+      self.libapi     = None
       self.handleProj = None
 
    def charPointerToList(self, char_pointer):
