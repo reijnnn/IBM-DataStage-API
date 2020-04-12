@@ -10,7 +10,7 @@ For the correct work `ctypes` with DataStage API library (32-bit or 64-bit) you 
 `PATH` on windows should include path where file `vmdsapi.dll` is located.  
 In most cases, in the `../IBM/InformationServer/Clients/Classic/`
 
-`LD_LIBRARY_PATH` on *nix should include path where file `libvmdsapi.so` and its dependences are located.  
+`LD_LIBRARY_PATH` on \*nix should include path where file `libvmdsapi.so` and its dependences are located.  
 In most cases, in the `../IBM/InformationServer/Server/DSEngine/lib/`
 
 ## Getting Started
