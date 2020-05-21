@@ -13,6 +13,10 @@ In most cases, in the `../IBM/InformationServer/Clients/Classic/`
 `LD_LIBRARY_PATH` on \*nix should include path where file `libvmdsapi.so` and its dependences are located.  
 In most cases, in the `../IBM/InformationServer/Server/DSEngine/lib/`
 
+Also activation of [dsenv](https://www.ibm.com/support/knowledgecenter/en/SSZJPZ_11.7.0/com.ibm.swg.im.iis.productization.iisinfsv.install.doc/topics/wsisinst_dsenv_file.html) can help you  
+`cd ../IBM/InformationServer/Server/DSEngine/`  
+`. ./dsenv`
+
 ## Getting Started
 
 Create your own `config.py` with path to DataStage API library (`vmdsapi.dll` on client or `libvmdsapi.so` on server) and configure connection's parameters.
