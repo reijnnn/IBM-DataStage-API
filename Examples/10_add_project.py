@@ -26,6 +26,20 @@ try:
 
    print(res)
 
+   DS_NEW_PROJECT_NAME = 'dsdev_api_project'
+
+   print("Creating the project {}".format(DS_NEW_PROJECT_NAME))
+   res, err = dsapi.DSAddProject(DS_NEW_PROJECT_NAME)
+   if err:
+      raise Exception("Can't create the project {}: {}".format(DS_NEW_PROJECT_NAME, err))
+
+   print("The list of available projects located on the server:")
+   res, err = dsapi.DSGetProjectList()
+   if err:
+      raise Exception("Can't get the list of the projects: {}".format(err))
+
+   print(res)
+
    dsapi.DSUnloadLibrary()
 
 except Exception as e:

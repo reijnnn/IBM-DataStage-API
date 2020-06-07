@@ -661,6 +661,28 @@ class DSAPI:
       else:
          return self.charPointerToList(varList), None
 
+   def DSAddProject(self, projectName, projectLocation=''):
+      self.libapi.DSAddProject.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
+      self.libapi.DSAddProject.restype  = ctypes.c_int
+
+      res = self.libapi.DSAddProject(self.encodeString(projectName), self.encodeString(projectLocation))
+
+      if res != self.DSJE_NOERROR:
+         return None, self.createError("[DSAddProject]: {}".format(self.DSGetLastError()))
+      else:
+         return 0, None
+
+   def DSDeleteProject(self, projectName):
+      self.libapi.DSDeleteProject.argtypes = [ctypes.c_char_p]
+      self.libapi.DSDeleteProject.restype  = ctypes.c_int
+
+      res = self.libapi.DSDeleteProject(self.encodeString(projectName))
+
+      if res != self.DSJE_NOERROR:
+         return None, self.createError("[DSDeleteProject]: {}".format(self.DSGetLastError()))
+      else:
+         return 0, None
+
    #####################################################
    ###              CUSTOM FUNCTIONS                 ###
    #####################################################
