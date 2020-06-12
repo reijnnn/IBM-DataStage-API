@@ -924,10 +924,10 @@ class DSAPI_ERRORS:
 
    @staticmethod
    def get_error(error_code):
-      try:
-         return [e for e in DSAPI_ERRORS.mapping if e['code'] == int(error_code)][0]
-      except IndexError:
-         return {'token': 'DSJE_UNKNOWN_ERRORCODE', 'code': error_code, 'msg': 'Unknown error code'}
+      for err in DSAPI_ERRORS.mapping:
+         if err['code'] == int(error_code):
+            return err
+      return {'token': 'DSJE_UNKNOWN_ERRORCODE', 'code': error_code, 'msg': 'Unknown error code'}
 
    @staticmethod
    def get_error_msg(error_code):
