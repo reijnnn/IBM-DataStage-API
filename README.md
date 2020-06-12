@@ -17,6 +17,10 @@ Also activation of [dsenv](https://www.ibm.com/support/knowledgecenter/en/SSZJPZ
 `cd ../IBM/InformationServer/Server/DSEngine/`  
 `. ./dsenv`
 
+## User credentials
+
+To use the DataStage API, you will need the operating system user credentials of the DataStage Engine server. By default, the `dsadm` credentials should work. Users for DataStage Director/Designer don't work.
+
 ## Getting Started
 
 Create your own `config.py` with path to DataStage API library (`vmdsapi.dll` on client or `libvmdsapi.so` on server) and configure connection's parameters.
