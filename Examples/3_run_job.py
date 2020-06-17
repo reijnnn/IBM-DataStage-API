@@ -70,14 +70,14 @@ try:
    job_param = DSPARAM()
    job_param.paramType = dsapi.DSJ_PARAMTYPE_STRING
    job_param.paramValue.pString = dsapi.encodeString('string value')
-   res, err = dsapi.DSSetParam(hjob, dsapi.encodeString('param_str'), job_param)
+   res, err = dsapi.DSSetParam(hjob, 'param_str', job_param)
    if err:
       print("Can't set the parameter: {}".format(err))
 
    job_param = DSPARAM()
    job_param.paramType = dsapi.DSJ_PARAMTYPE_ENCRYPTED
    job_param.paramValue.pEncrypt = dsapi.encodeString('string encrypted value')
-   res, err = dsapi.DSSetParam(hjob, dsapi.encodeString('param_ecrypted'), job_param)
+   res, err = dsapi.DSSetParam(hjob, 'param_ecrypted', job_param)
    if err:
       print("Can't set the parameter: {}".format(err))
 

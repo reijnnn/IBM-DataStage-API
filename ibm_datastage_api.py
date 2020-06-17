@@ -129,7 +129,6 @@ class DSREPOSUSAGE(ctypes.Structure):
    _fields_ = [("infoType", ctypes.c_int),
                ("info",     DSREPOSUSAGE_info)]
 
-
 # API INTERFACE
 class DSAPI:
    # API Version
@@ -219,50 +218,50 @@ class DSAPI:
    DSJ_LIMITROWS = 2 # Stages to be limited to LimitValue rows
 
    def __init__(self):
-      self.libapi     = None
-      self.handleProj = None
+      self.__api        = None
+      self.__handleProj = None
 
    # API FUNCTIONS
    def DSSetServerParams(self, domainName, userName, password, serverName):
-      self.libapi.DSSetServerParams.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
-      self.libapi.DSSetServerParams.restype  = ctypes.c_void_p
+      self.__api.DSSetServerParams.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+      self.__api.DSSetServerParams.restype  = ctypes.c_void_p
 
-      self.libapi.DSSetServerParams(self.encodeString(domainName), self.encodeString(userName), self.encodeString(password), self.encodeString(serverName))
+      self.__api.DSSetServerParams(self.encodeString(domainName), self.encodeString(userName), self.encodeString(password), self.encodeString(serverName))
 
       return True, None
 
    def DSGetProjectList(self):
-      self.libapi.DSGetProjectList.argtypes = []
-      self.libapi.DSGetProjectList.restype  = ctypes.POINTER(ctypes.c_char)
+      self.__api.DSGetProjectList.argtypes = []
+      self.__api.DSGetProjectList.restype  = ctypes.POINTER(ctypes.c_char)
 
-      projectList = self.libapi.DSGetProjectList()
+      projectList = self.__api.DSGetProjectList()
 
       if not projectList:
-         return None, self.createError("[DSGetProjectList]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSGetProjectList", self.DSGetLastError())
       else:
          return self.charPointerToList(projectList), None
 
    def DSOpenProject(self, projectName):
-      self.libapi.DSOpenProjectEx.argtypes = [ctypes.c_int, ctypes.c_char_p]
-      self.libapi.DSOpenProjectEx.restype  = ctypes.POINTER(DSPROJECT)
+      self.__api.DSOpenProjectEx.argtypes = [ctypes.c_int, ctypes.c_char_p]
+      self.__api.DSOpenProjectEx.restype  = ctypes.POINTER(DSPROJECT)
 
-      handleProj = self.libapi.DSOpenProjectEx(self.DSAPI_VERSION, self.encodeString(projectName))
+      handleProj = self.__api.DSOpenProjectEx(self.DSAPI_VERSION, self.encodeString(projectName))
 
       if not handleProj:
-         return None, self.createError("[DSOpenProject]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSOpenProject", self.DSGetLastError())
       else:
-         self.handleProj = handleProj
+         self.__handleProj = handleProj
          return handleProj, None
 
    def DSGetProjectInfo(self, handleProj, infoType):
-      self.libapi.DSGetProjectInfo.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_int, ctypes.POINTER(DSPROJECTINFO)]
-      self.libapi.DSGetProjectInfo.restype  = ctypes.c_int
+      self.__api.DSGetProjectInfo.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_int, ctypes.POINTER(DSPROJECTINFO)]
+      self.__api.DSGetProjectInfo.restype  = ctypes.c_int
 
       projInfo = DSPROJECTINFO()
-      res = self.libapi.DSGetProjectInfo(handleProj, infoType, ctypes.pointer(projInfo))
+      res = self.__api.DSGetProjectInfo(handleProj, infoType, ctypes.pointer(projInfo))
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSGetProjectInfo]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSGetProjectInfo", self.DSGetLastError())
 
       if infoType == self.DSJ_JOBLIST:
          return self.charPointerToList(projInfo.info.jobList), None
@@ -280,40 +279,43 @@ class DSAPI:
          return '', None
 
    def DSGetLastError(self):
-      self.libapi.DSGetLastError.restype = ctypes.c_int
+      self.__api.DSGetLastError.restype = ctypes.c_int
 
-      self.libapi.DSGetLastErrorMsg.argtypes = [ctypes.POINTER(DSPROJECT)]
-      self.libapi.DSGetLastErrorMsg.restype  =  ctypes.c_char_p
+      self.__api.DSGetLastErrorMsg.argtypes = [ctypes.POINTER(DSPROJECT)]
+      self.__api.DSGetLastErrorMsg.restype  =  ctypes.c_char_p
 
-      error_code = self.libapi.DSGetLastError()
-      if self.handleProj is not None:
-         error_msg = self.decodeBytes(self.libapi.DSGetLastErrorMsg(self.handleProj))
-      else:
+      error_code = self.__api.DSGetLastError()
+      error_msg  = None
+
+      if self.__handleProj is not None:
+         error_msg = self.decodeBytes(self.__api.DSGetLastErrorMsg(self.__handleProj))
+
+      if not error_msg:
          error_msg = DSAPI_ERRORS.get_error_msg(error_code)
 
-      return "{}, {}".format(error_code, error_msg)
+      return {'code': error_code, 'msg': error_msg}
 
    def DSOpenJob(self, handleProj, jobName):
-      self.libapi.DSOpenJob.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p]
-      self.libapi.DSOpenJob.restype  = ctypes.POINTER(DSJOB)
+      self.__api.DSOpenJob.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p]
+      self.__api.DSOpenJob.restype  = ctypes.POINTER(DSJOB)
 
-      handleJob = self.libapi.DSOpenJob(handleProj, ctypes.c_char_p(self.encodeString(jobName)))
+      handleJob = self.__api.DSOpenJob(handleProj, ctypes.c_char_p(self.encodeString(jobName)))
 
       if not handleJob:
-         return None, self.createError("[DSOpenJob]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSOpenJob", self.DSGetLastError())
       else:
          self.handleJob = handleJob
          return handleJob, None
 
    def DSGetJobInfo(self, handleJob, infoType):
-      self.libapi.DSGetJobInfo.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.POINTER(DSJOBINFO)]
-      self.libapi.DSGetJobInfo.restype  = ctypes.c_int
+      self.__api.DSGetJobInfo.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.POINTER(DSJOBINFO)]
+      self.__api.DSGetJobInfo.restype  = ctypes.c_int
 
       jobInfo = DSJOBINFO()
-      res = self.libapi.DSGetJobInfo(handleJob, infoType, ctypes.pointer(jobInfo))
+      res = self.__api.DSGetJobInfo(handleJob, infoType, ctypes.pointer(jobInfo))
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSGetJobInfo]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSGetJobInfo", self.DSGetLastError())
       else:
          if infoType == self.DSJ_JOBSTATUS:
             return jobInfo.info.jobStatus, None
@@ -361,318 +363,376 @@ class DSAPI:
             return '', None
 
    def DSFindFirstLogEntry(self, handleJob, eventType=DSJ_LOGANY, startTime=0, endTime=0, maxNumber=500):
-      self.libapi.DSFindFirstLogEntry.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, time_t, time_t, ctypes.c_int, ctypes.POINTER(DSLOGEVENT)]
-      self.libapi.DSFindFirstLogEntry.restype  = ctypes.c_int
+      self.__api.DSFindFirstLogEntry.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, time_t, time_t, ctypes.c_int, ctypes.POINTER(DSLOGEVENT)]
+      self.__api.DSFindFirstLogEntry.restype  = ctypes.c_int
 
       logInfo = DSLOGEVENT()
-      res = self.libapi.DSFindFirstLogEntry(handleJob, eventType, startTime, endTime, maxNumber, ctypes.pointer(logInfo))
+      res = self.__api.DSFindFirstLogEntry(handleJob, eventType, startTime, endTime, maxNumber, ctypes.pointer(logInfo))
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSFindFirstLogEntry]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSFindFirstLogEntry", self.DSGetLastError())
       else:
          return logInfo, None
 
    def DSFindNextLogEntry(self, handleJob):
-      self.libapi.DSFindNextLogEntry.argtypes = [ctypes.POINTER(DSJOB), ctypes.POINTER(DSLOGEVENT)]
-      self.libapi.DSFindNextLogEntry.restype = ctypes.c_int
+      self.__api.DSFindNextLogEntry.argtypes = [ctypes.POINTER(DSJOB), ctypes.POINTER(DSLOGEVENT)]
+      self.__api.DSFindNextLogEntry.restype  = ctypes.c_int
 
       logEvent = DSLOGEVENT()
-      res = self.libapi.DSFindNextLogEntry(handleJob, ctypes.pointer(logEvent))
+      res = self.__api.DSFindNextLogEntry(handleJob, ctypes.pointer(logEvent))
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSFindNextLogEntry]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSFindNextLogEntry", self.DSGetLastError())
       else:
          return logEvent, None
 
    def DSGetLogEntryFull(self, handleJob, eventId):
-      self.libapi.DSGetLogEntryFull.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.POINTER(DSLOGDETAILFULL)]
-      self.libapi.DSGetLogEntryFull.restype  = ctypes.c_int
+      self.__api.DSGetLogEntryFull.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.POINTER(DSLOGDETAILFULL)]
+      self.__api.DSGetLogEntryFull.restype  = ctypes.c_int
 
       logDetail = DSLOGDETAILFULL()
-      res = self.libapi.DSGetLogEntryFull(handleJob, eventId, ctypes.pointer(logDetail))
+      res = self.__api.DSGetLogEntryFull(handleJob, eventId, ctypes.pointer(logDetail))
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSGetLogEntryFull]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSGetLogEntryFull", self.DSGetLastError())
       else:
          return logDetail, None
 
    def DSGetLogEntry(self, handleJob, eventId):
-      self.libapi.DSGetLogEntry.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.POINTER(DSLOGDETAIL)]
-      self.libapi.DSGetLogEntry.restype  = ctypes.c_int
+      self.__api.DSGetLogEntry.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.POINTER(DSLOGDETAIL)]
+      self.__api.DSGetLogEntry.restype  = ctypes.c_int
 
       logDetail = DSLOGDETAIL()
-      res = self.libapi.DSGetLogEntry(handleJob, eventId, ctypes.pointer(logDetail))
+      res = self.__api.DSGetLogEntry(handleJob, eventId, ctypes.pointer(logDetail))
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSGetLogEntry]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSGetLogEntry", self.DSGetLastError())
       else:
          return logDetail, None
 
    def DSGetNewestLogId(self, handleJob, eventType):
-      self.libapi.DSGetNewestLogId.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int]
-      self.libapi.DSGetNewestLogId.restype  = ctypes.c_int
+      self.__api.DSGetNewestLogId.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int]
+      self.__api.DSGetNewestLogId.restype  = ctypes.c_int
 
-      lastLogId = self.libapi.DSGetNewestLogId(handleJob, eventType)
+      lastLogId = self.__api.DSGetNewestLogId(handleJob, eventType)
 
       if lastLogId == -1:
-         return None, self.createError("[DSGetNewestLogId]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSGetNewestLogId", self.DSGetLastError())
       else:
          return lastLogId, None
 
    def DSGetLogEventIds(self, handleJob, runNumber=0, filter=''):
-      self.libapi.DSGetLogEventIds.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.c_char_p, ctypes.POINTER(ctypes.POINTER(ctypes.c_char))]
-      self.libapi.DSGetLogEventIds.restype  = ctypes.c_int
+      self.__api.DSGetLogEventIds.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.c_char_p, ctypes.POINTER(ctypes.POINTER(ctypes.c_char))]
+      self.__api.DSGetLogEventIds.restype  = ctypes.c_int
 
       eventsPointer = ctypes.POINTER(ctypes.c_char)()
-      res = self.libapi.DSGetLogEventIds(handleJob, runNumber, self.encodeString(filter), ctypes.pointer(eventsPointer))
+      res = self.__api.DSGetLogEventIds(handleJob, runNumber, self.encodeString(filter), ctypes.pointer(eventsPointer))
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSGetLogEventIds]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSGetLogEventIds", self.DSGetLastError())
       else:
          return self.charPointerToList(eventsPointer), None
 
    def DSGetQueueList(self):
-      self.libapi.DSGetQueueList.restype = ctypes.POINTER(ctypes.c_char)
-      qList = self.libapi.DSGetQueueList()
+      self.__api.DSGetQueueList.restype = ctypes.POINTER(ctypes.c_char)
+      qList = self.__api.DSGetQueueList()
 
       return self.charPointerToList(qList), None
 
    def DSSetJobQueue(self, handleJob, queueName):
-      self.libapi.DSSetJobQueue.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_char_p]
-      self.libapi.DSSetJobQueue.restype  = ctypes.c_int
+      self.__api.DSSetJobQueue.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_char_p]
+      self.__api.DSSetJobQueue.restype  = ctypes.c_int
 
-      res = self.libapi.DSSetJobQueue(handleJob, queueName)
+      res = self.__api.DSSetJobQueue(handleJob, queueName)
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSSetJobQueue]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSSetJobQueue", self.DSGetLastError())
       else:
          return 0, None
 
    def DSCloseJob(self, handleJob):
-      self.libapi.DSCloseJob.argtypes = [ctypes.POINTER(DSJOB)]
-      self.libapi.DSCloseJob.restype  = ctypes.c_int
+      self.__api.DSCloseJob.argtypes = [ctypes.POINTER(DSJOB)]
+      self.__api.DSCloseJob.restype  = ctypes.c_int
 
-      res = self.libapi.DSCloseJob(handleJob)
+      res = self.__api.DSCloseJob(handleJob)
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSCloseJob]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSCloseJob", self.DSGetLastError())
       else:
          return 0, None
 
    def DSCloseProject(self, handleProj):
-      self.libapi.DSCloseProject.argtypes = [ctypes.POINTER(DSPROJECT)]
-      self.libapi.DSCloseProject.restype  = ctypes.c_int
+      self.__api.DSCloseProject.argtypes = [ctypes.POINTER(DSPROJECT)]
+      self.__api.DSCloseProject.restype  = ctypes.c_int
 
-      res = self.libapi.DSCloseProject(self.handleProj)
-      self.handleProj = None
+      res = self.__api.DSCloseProject(handleProj)
+      self.__handleProj = None
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSCloseProject]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSCloseProject", self.DSGetLastError())
       else:
          return 0, None
 
    def DSSetJobLimit(self, handleJob, limitType, limitValue):
-      self.libapi.DSSetJobLimit.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.c_int]
-      self.libapi.DSSetJobLimit.restype  = ctypes.c_int
+      self.__api.DSSetJobLimit.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.c_int]
+      self.__api.DSSetJobLimit.restype  = ctypes.c_int
 
-      res = self.libapi.DSSetJobLimit(handleJob, limitType, limitValue)
+      res = self.__api.DSSetJobLimit(handleJob, limitType, limitValue)
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSSetJobLimit]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSSetJobLimit", self.DSGetLastError())
       else:
          return 0, None
 
    def DSPurgeJob(self, handleJob, purgeSpec):
-      self.libapi.DSPurgeJob.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int]
-      self.libapi.DSPurgeJob.restype  = ctypes.c_int
+      self.__api.DSPurgeJob.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int]
+      self.__api.DSPurgeJob.restype  = ctypes.c_int
 
-      res = self.libapi.DSPurgeJob(handleJob, purgeSpec)
+      res = self.__api.DSPurgeJob(handleJob, purgeSpec)
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSPurgeJob]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSPurgeJob", self.DSGetLastError())
       else:
          return 0, None
 
    def DSRunJob(self, handleJob, runMode):
-      self.libapi.DSRunJob.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int]
-      self.libapi.DSRunJob.restype  = ctypes.c_int
+      self.__api.DSRunJob.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int]
+      self.__api.DSRunJob.restype  = ctypes.c_int
 
-      res = self.libapi.DSRunJob(handleJob, runMode)
+      res = self.__api.DSRunJob(handleJob, runMode)
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSRunJob]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSRunJob", self.DSGetLastError())
       else:
          return 0, None
 
    def DSStopJob(self, handleJob):
-      self.libapi.DSStopJob.argtypes = [ctypes.POINTER(DSJOB)]
-      self.libapi.DSStopJob.restype  = ctypes.c_int
+      self.__api.DSStopJob.argtypes = [ctypes.POINTER(DSJOB)]
+      self.__api.DSStopJob.restype  = ctypes.c_int
 
-      res = self.libapi.DSStopJob(handleJob)
+      res = self.__api.DSStopJob(handleJob)
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSStopJob]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSStopJob", self.DSGetLastError())
       else:
          return 0, None
 
    def DSLockJob(self, handleJob):
-      self.libapi.DSLockJob.argtypes = [ctypes.POINTER(DSJOB)]
-      self.libapi.DSLockJob.restype  = ctypes.c_int
+      self.__api.DSLockJob.argtypes = [ctypes.POINTER(DSJOB)]
+      self.__api.DSLockJob.restype  = ctypes.c_int
 
-      res = self.libapi.DSLockJob(handleJob)
+      res = self.__api.DSLockJob(handleJob)
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSLockJob]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSLockJob", self.DSGetLastError())
       else:
          return 0, None
 
    def DSUnlockJob(self, handleJob):
-      self.libapi.DSUnlockJob.argtypes = [ctypes.POINTER(DSJOB)]
-      self.libapi.DSUnlockJob.restype  = ctypes.c_int
+      self.__api.DSUnlockJob.argtypes = [ctypes.POINTER(DSJOB)]
+      self.__api.DSUnlockJob.restype  = ctypes.c_int
 
-      res = self.libapi.DSUnlockJob(handleJob)
+      res = self.__api.DSUnlockJob(handleJob)
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSUnlockJob]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSUnlockJob", self.DSGetLastError())
       else:
          return 0, None
 
    def DSWaitForJob(self, handleJob):
-      self.libapi.DSWaitForJob.argtypes = [ctypes.POINTER(DSJOB)]
-      self.libapi.DSWaitForJob.restype  = ctypes.c_int
+      self.__api.DSWaitForJob.argtypes = [ctypes.POINTER(DSJOB)]
+      self.__api.DSWaitForJob.restype  = ctypes.c_int
 
-      res = self.libapi.DSWaitForJob(handleJob)
+      res = self.__api.DSWaitForJob(handleJob)
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSWaitForJob]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSWaitForJob", self.DSGetLastError())
       else:
          return 0, None
 
    def DSSetParam(self, handleJob, paramName, param):
-      self.libapi.DSSetParam.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_char_p, ctypes.POINTER(DSPARAM)]
-      self.libapi.DSSetParam.restype  = ctypes.c_int
+      self.__api.DSSetParam.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_char_p, ctypes.POINTER(DSPARAM)]
+      self.__api.DSSetParam.restype  = ctypes.c_int
 
-      res = self.libapi.DSSetParam(handleJob, paramName, ctypes.pointer(param))
+      res = self.__api.DSSetParam(handleJob, self.encodeString(paramName), ctypes.pointer(param))
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSSetParam]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSSetParam", self.DSGetLastError())
       else:
          return 0, None
 
    def DSGetParamInfo(self, handleJob, paramName):
-      self.libapi.DSGetParamInfo.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_char_p, ctypes.POINTER(DSPARAMINFO)]
-      self.libapi.DSGetParamInfo.restype  = ctypes.c_int
+      self.__api.DSGetParamInfo.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_char_p, ctypes.POINTER(DSPARAMINFO)]
+      self.__api.DSGetParamInfo.restype  = ctypes.c_int
 
       paramInfo = DSPARAMINFO()
-      res = self.libapi.DSGetParamInfo(handleJob, self.encodeString(paramName), ctypes.pointer(paramInfo))
+      res = self.__api.DSGetParamInfo(handleJob, self.encodeString(paramName), ctypes.pointer(paramInfo))
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSGetParamInfo]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSGetParamInfo", self.DSGetLastError())
       else:
          return paramInfo, None
 
    def DSMakeJobReport(self, handleJob, reportType, lineSeparator='CRLF'):
-      self.libapi.DSMakeJobReport.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.c_char_p, ctypes.POINTER(DSREPORTINFO)]
-      self.libapi.DSMakeJobReport.restype  = ctypes.c_int
+      self.__api.DSMakeJobReport.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.c_char_p, ctypes.POINTER(DSREPORTINFO)]
+      self.__api.DSMakeJobReport.restype  = ctypes.c_int
 
       reportInfo = DSREPORTINFO()
-      res = self.libapi.DSMakeJobReport(handleJob, reportType, self.encodeString(lineSeparator), ctypes.pointer(reportInfo))
+      res = self.__api.DSMakeJobReport(handleJob, reportType, self.encodeString(lineSeparator), ctypes.pointer(reportInfo))
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSMakeJobReport]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSMakeJobReport", self.DSGetLastError())
       else:
          return reportInfo.info.reportText, None
 
    def DSGetReposUsage(self, handleProj, relationshipType, objectName, recursive=0):
-      self.libapi.DSGetReposUsage.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(DSREPOSUSAGE)]
-      self.libapi.DSGetReposUsage.restype  = ctypes.c_int
+      self.__api.DSGetReposUsage.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(DSREPOSUSAGE)]
+      self.__api.DSGetReposUsage.restype  = ctypes.c_int
 
       reposInfo = DSREPOSUSAGE()
-      res = self.libapi.DSGetReposUsage(handleProj, relationshipType, self.encodeString(objectName), recursive, ctypes.pointer(reposInfo))
+      res = self.__api.DSGetReposUsage(handleProj, relationshipType, self.encodeString(objectName), recursive, ctypes.pointer(reposInfo))
 
       if res in [DSAPI_ERRORS.DSJE_REPERROR, DSAPI_ERRORS.DSJE_NO_DATASTAGE, DSAPI_ERRORS.DSJE_UNKNOWN_JOBNAME]:
-         return None, self.createError("[DSGetReposUsage]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSGetReposUsage", self.DSGetLastError())
       if res == 0:
          return None, None
 
       return reposInfo.info.jobs.contents, None
 
    def DSLogEvent(self, handleJob, eventType, message):
-      self.libapi.DSLogEvent.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.c_char_p, ctypes.c_char_p]
-      self.libapi.DSLogEvent.restype  = ctypes.c_int
+      self.__api.DSLogEvent.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.c_char_p, ctypes.c_char_p]
+      self.__api.DSLogEvent.restype  = ctypes.c_int
 
-      res = self.libapi.DSLogEvent(handleJob, eventType, self.encodeString(''), self.encodeString(message))
+      res = self.__api.DSLogEvent(handleJob, eventType, self.encodeString(''), self.encodeString(message))
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSLogEvent]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSLogEvent", self.DSGetLastError())
       else:
          return 0, None
 
    def DSAddEnvVar(self, handleProj, envVarName, varType, promptText, value):
-      self.libapi.DSAddEnvVar.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
-      self.libapi.DSAddEnvVar.restype  = ctypes.c_int
+      self.__api.DSAddEnvVar.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+      self.__api.DSAddEnvVar.restype  = ctypes.c_int
 
-      res = self.libapi.DSAddEnvVar(handleProj, self.encodeString(envVarName), self.encodeString(varType), self.encodeString(promptText), self.encodeString(value))
+      res = self.__api.DSAddEnvVar(handleProj, self.encodeString(envVarName), self.encodeString(varType), self.encodeString(promptText), self.encodeString(value))
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSAddEnvVar]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSAddEnvVar", self.DSGetLastError())
       else:
          return 0, None
 
    def DSDeleteEnvVar(self, handleProj, envVarName):
-      self.libapi.DSDeleteEnvVar.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p]
-      self.libapi.DSDeleteEnvVar.restype  = ctypes.c_int
+      self.__api.DSDeleteEnvVar.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p]
+      self.__api.DSDeleteEnvVar.restype  = ctypes.c_int
 
-      res = self.libapi.DSDeleteEnvVar(handleProj, self.encodeString(envVarName))
+      res = self.__api.DSDeleteEnvVar(handleProj, self.encodeString(envVarName))
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSDeleteEnvVar]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSDeleteEnvVar", self.DSGetLastError())
       else:
          return 0, None
 
    def DSSetEnvVar(self, handleProj, envVarName, value):
-      self.libapi.DSSetEnvVar.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p, ctypes.c_char_p]
-      self.libapi.DSSetEnvVar.restype  = ctypes.c_int
+      self.__api.DSSetEnvVar.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p, ctypes.c_char_p]
+      self.__api.DSSetEnvVar.restype  = ctypes.c_int
 
-      res = self.libapi.DSSetEnvVar(handleProj, self.encodeString(envVarName), self.encodeString(value))
+      res = self.__api.DSSetEnvVar(handleProj, self.encodeString(envVarName), self.encodeString(value))
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSSetEnvVar]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSSetEnvVar", self.DSGetLastError())
       else:
          return 0, None
 
    def DSListEnvVars(self, handleProj):
-      self.libapi.DSListEnvVars.argtypes = [ctypes.POINTER(DSPROJECT)]
-      self.libapi.DSListEnvVars.restype  = ctypes.POINTER(ctypes.c_char)
+      self.__api.DSListEnvVars.argtypes = [ctypes.POINTER(DSPROJECT)]
+      self.__api.DSListEnvVars.restype  = ctypes.POINTER(ctypes.c_char)
 
-      varList = self.libapi.DSListEnvVars(handleProj)
+      varList = self.__api.DSListEnvVars(handleProj)
 
       if not varList:
-         return None, self.createError("[DSListEnvVars]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSListEnvVars", self.DSGetLastError())
       else:
          return self.charPointerToList(varList), None
 
    def DSAddProject(self, projectName, projectLocation=''):
-      self.libapi.DSAddProject.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
-      self.libapi.DSAddProject.restype  = ctypes.c_int
+      self.__api.DSAddProject.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
+      self.__api.DSAddProject.restype  = ctypes.c_int
 
-      res = self.libapi.DSAddProject(self.encodeString(projectName), self.encodeString(projectLocation))
+      res = self.__api.DSAddProject(self.encodeString(projectName), self.encodeString(projectLocation))
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSAddProject]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSAddProject", self.DSGetLastError())
       else:
          return 0, None
 
    def DSDeleteProject(self, projectName):
-      self.libapi.DSDeleteProject.argtypes = [ctypes.c_char_p]
-      self.libapi.DSDeleteProject.restype  = ctypes.c_int
+      self.__api.DSDeleteProject.argtypes = [ctypes.c_char_p]
+      self.__api.DSDeleteProject.restype  = ctypes.c_int
 
-      res = self.libapi.DSDeleteProject(self.encodeString(projectName))
+      res = self.__api.DSDeleteProject(self.encodeString(projectName))
 
       if res != DSAPI_ERRORS.DSJE_NOERROR:
-         return None, self.createError("[DSDeleteProject]: {}".format(self.DSGetLastError()))
+         return None, self.createError("DSDeleteProject", self.DSGetLastError())
       else:
          return 0, None
+
+   def DSGetIdForJob(self, handleProj, jobName):
+      self.__api.DSGetIdForJob.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p]
+      self.__api.DSGetIdForJob.restype  = ctypes.c_char_p
+
+      jobId = self.__api.DSGetIdForJob(handleProj, self.encodeString(jobName))
+
+      if not jobId:
+         return None, self.createError("DSGetIdForJob", self.DSGetLastError())
+      else:
+         return jobId, None
+
+   def DSSetIdForJob(self, handleProj, jobName, jobId):
+      self.__api.DSSetIdForJob.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p, ctypes.c_char_p]
+      self.__api.DSSetIdForJob.restype  = ctypes.c_int
+
+      res = self.__api.DSSetIdForJob(handleProj, self.encodeString(jobName), self.encodeString(jobId))
+
+      if res != DSAPI_ERRORS.DSJE_NOERROR:
+         return None, self.createError("DSSetIdForJob", self.DSGetLastError())
+      else:
+         return 0, None
+
+   def DSJobNameFromJobId(self, handleProj, jobId):
+      self.__api.DSJobNameFromJobId.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p]
+      self.__api.DSJobNameFromJobId.restype  = ctypes.c_char_p
+
+      jobName = self.__api.DSJobNameFromJobId(handleProj, self.encodeString(jobId))
+
+      if not jobName:
+         return None, self.createError("DSJobNameFromJobId", self.DSGetLastError())
+      else:
+         return jobName, None
+
+   def DSServerMessage(self, defMsg, prms=[], msgIdStr='', sizeMessage=1000):
+      # How to use messages from the msg.text file?
+      # Where to find another message ids? For example DSTAGE_JSG_M_0001-DSTAGE_JSG_M_0075
+      # Why [L] and [E] are not replaced?
+      # What errors are possible?
+      if not isinstance(prms, list):
+         return None, self.createError("DSServerMessage", "Variable prms must be a list")
+
+      maxPrms = len(prms)
+
+      self.__api.DSServerMessage.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p * maxPrms, ctypes.c_char_p, ctypes.c_int]
+      self.__api.DSServerMessage.restype  = ctypes.c_int
+
+      encodedPrms = [self.encodeString(str(prm)) for prm in prms]
+      resMessage  = ctypes.c_char_p(self.encodeString(''))
+
+      res = self.__api.DSServerMessage(self.encodeString(msgIdStr), self.encodeString(defMsg), (ctypes.c_char_p * maxPrms)(*encodedPrms), resMessage, sizeMessage)
+
+      if res < 0:
+         return None, self.createError("DSServerMessage", self.DSGetLastError())
+      if res == 0:
+         return '', None
+
+      return resMessage.value, None
 
    # CUSTOM FUNCTIONS
    def DSLoadLibrary(self, api_lib_file):
@@ -690,47 +750,52 @@ class DSAPI:
       """
 
       if not os.path.exists(api_lib_file) or not os.path.isfile(api_lib_file):
-         return None, self.createError("[DSLoadLibrary]: path to {} doesn't exist".format(api_lib_file))
+         return None, self.createError("DSLoadLibrary", "Path to {} doesn't exist".format(api_lib_file))
 
       try:
-         self.libapi = ctypes.CDLL(api_lib_file)
+         self.__api = ctypes.CDLL(api_lib_file)
       except OSError as e:
-         return None, self.createError("[DSLoadLibrary]: can't load the library: {}".format(str(e)))
+         return None, self.createError("DSLoadLibrary", "Can't load the library: {}".format(str(e)))
 
       return True, None
 
    def DSUnloadLibrary(self):
-      self.libapi     = None
-      self.handleProj = None
+      self.__api        = None
+      self.__handleProj = None
 
-   def charPointerToList(self, char_pointer):
+   def charPointerToList(self, char_p):
+      words_list = []
 
-      if not char_pointer:
-         return []
+      if not char_p:
+         return words_list
 
-      char_list = []
-      word      = ''
-      pred_char = '*'
-      stop_char = b'\x00'
-      it        = 0
-
+      start_word_pos = 0
+      it = 0
       while True:
-         if char_pointer[it] == stop_char:
-            if pred_char == stop_char:
+         if char_p[it] == b'\x00':
+            if it - 1 >= 0 and char_p[it - 1] == b'\x00':
                break
-
-            char_list.append(word)
-            word = ''
-         else:
-            word = word + self.decodeBytes(char_pointer[it])
-
-         pred_char = char_pointer[it]
+            words_list.append(char_p[start_word_pos:it])
+            start_word_pos = it + 1
          it = it + 1
 
-      return char_list
+      return words_list
 
-   def createError(self, error_msg):
-      return "[ERROR.DSAPI]: {}" .format(error_msg)
+   def createError(self, func_name, api_error):
+      err_obj = {
+         'type': 'error',
+         'func': func_name,
+         'code': None,
+         'msg' : ''
+      }
+
+      if isinstance(api_error, dict):
+         for key, val in api_error.items():
+            err_obj[key] = val
+      else:
+         err_obj['msg'] = str(api_error)
+
+      return err_obj
 
    def decodeBytes(self, str):
       return str.decode("cp1251", errors="ignore")
@@ -830,7 +895,7 @@ class DSAPI_ERRORS:
    DSJE_BAD_CREDENTIAL         = 80011
    DSJE_PASSWORD_EXPIRED       = 80019
 
-   mapping = [
+   __mapping = [
       {'token': 'DSJE_NOERROR', 'code': 0, 'msg': 'No error'},
       {'token': 'DSJE_BADHANDLE', 'code': -1, 'msg': 'Invalid JobHandle'},
       {'token': 'DSJE_BADSTATE', 'code': -2, 'msg': 'Job is not in the right state (must be compiled & not running)'},
@@ -924,7 +989,7 @@ class DSAPI_ERRORS:
 
    @staticmethod
    def get_error(error_code):
-      for err in DSAPI_ERRORS.mapping:
+      for err in DSAPI_ERRORS.__mapping:
          if err['code'] == int(error_code):
             return err
       return {'token': 'DSJE_UNKNOWN_ERRORCODE', 'code': error_code, 'msg': 'Unknown error code'}
