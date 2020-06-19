@@ -217,6 +217,17 @@ class DSAPI:
    DSJ_LIMITWARN = 1 # Job to be stopped after LimitValue warning events
    DSJ_LIMITROWS = 2 # Stages to be limited to LimitValue rows
 
+   # DSSetProjectProperty 'property' values
+   DSA_OSHVISIBLEFLAG                = 'OSHVisibleFlag'
+   DSA_PRJ_JOBADMIN_ENABLED          = 'JobAdminEnabled'
+   DSA_PRJ_RTCP_ENABLED              = 'RTCPEnabled'
+   DSA_PRJ_PROTECTION_ENABLED        = 'ProtectionEnabled'
+   DSA_PRJ_PX_ADVANCED_RUNTIME_OPTS  = 'PXAdvRTOptions'
+   DSA_PRJ_PX_DEPLOY_CUSTOM_ACTION   = 'PXDeployCustomAction'
+   DSA_PRJ_PX_DEPLOY_JOBDIR_TEMPLATE = 'PXDeployJobDirectoryTemplate'
+   DSA_PRJ_PX_BASEDIR                = 'PXRemoteBaseDirectory'
+   DSA_PRJ_PX_DEPLOY_GENERATE_XML    = 'PXDeployGenerateXML'
+
    def __init__(self):
       self.__api        = None
       self.__handleProj = None
@@ -733,6 +744,28 @@ class DSAPI:
          return '', None
 
       return resMessage.value, None
+
+   def DSSetProjectProperty(self, handleProj, property, value):
+      self.__api.DSSetProjectProperty.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p, ctypes.c_char_p]
+      self.__api.DSSetProjectProperty.restype  = ctypes.c_int
+
+      res = self.__api.DSSetProjectProperty(handleProj, self.encodeString(property), self.encodeString(value))
+
+      if res != DSAPI_ERRORS.DSJE_NOERROR:
+         return None, self.createError("DSSetProjectProperty", self.DSGetLastError())
+      else:
+         return 0, None
+
+   def DSListProjectProperties(self, handleProj):
+      self.__api.DSListProjectProperties.argtypes = [ctypes.POINTER(DSPROJECT)]
+      self.__api.DSListProjectProperties.restype  = ctypes.POINTER(ctypes.c_char)
+
+      propList = self.__api.DSListProjectProperties(handleProj)
+
+      if not propList:
+         return None, self.createError("DSListProjectProperties", self.DSGetLastError())
+      else:
+         return self.charPointerToList(propList), None
 
    # CUSTOM FUNCTIONS
    def DSLoadLibrary(self, api_lib_file):
