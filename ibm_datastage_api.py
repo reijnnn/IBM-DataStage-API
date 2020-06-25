@@ -736,14 +736,12 @@ class DSAPI:
       encodedPrms = [self.encodeString(str(prm)) for prm in prms]
       resMessage  = ctypes.c_char_p(self.encodeString(''))
 
-      res = self.__api.DSServerMessage(self.encodeString(msgIdStr), self.encodeString(defMsg), (ctypes.c_char_p * maxPrms)(*encodedPrms), resMessage, sizeMessage)
+      msgSize = self.__api.DSServerMessage(self.encodeString(msgIdStr), self.encodeString(defMsg), (ctypes.c_char_p * maxPrms)(*encodedPrms), resMessage, sizeMessage)
 
-      if res < 0:
+      if not resMessage:
          return None, self.createError("DSServerMessage", self.DSGetLastError())
-      if res == 0:
-         return '', None
-
-      return resMessage.value, None
+      else:
+         return resMessage.value, None
 
    def DSSetProjectProperty(self, handleProj, property, value):
       self.__api.DSSetProjectProperty.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_char_p, ctypes.c_char_p]
@@ -766,6 +764,51 @@ class DSAPI:
          return None, self.createError("DSListProjectProperties", self.DSGetLastError())
       else:
          return self.charPointerToList(propList), None
+
+   def DSGetWLMEnabled(self):
+      self.__api.DSGetWLMEnabled.argtypes = []
+      self.__api.DSGetWLMEnabled.restype  = ctypes.c_int
+
+      WLMEnabled = self.__api.DSGetWLMEnabled()
+
+      if not WLMEnabled:
+         return None, self.createError("DSGetWLMEnabled", self.DSGetLastError())
+      else:
+         return 0, None
+
+   def DSSetGenerateOpMetaData(self, handleJob, value):
+      self.__api.DSSetGenerateOpMetaData.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int]
+      self.__api.DSSetGenerateOpMetaData.restype  = ctypes.c_int
+
+      res = self.__api.DSSetGenerateOpMetaData(handleJob, value)
+
+      if res != DSAPI_ERRORS.DSJE_NOERROR:
+         return None, self.createError("DSSetGenerateOpMetaData", self.DSGetLastError())
+      else:
+         return 0, None
+
+   def DSSetDisableProjectHandler(self, handleProj, value):
+      # Does function work incorrectly due to bad definition in dsapi.h?
+      self.__api.DSSetDisableProjectHandler.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_int]
+      self.__api.DSSetDisableProjectHandler.restype  = ctypes.c_int
+
+      res = self.__api.DSSetDisableProjectHandler(handleProj, value)
+
+      if res != DSAPI_ERRORS.DSJE_NOERROR:
+         return None, self.createError("DSSetDisableProjectHandler", self.DSGetLastError())
+      else:
+         return 0, None
+
+   def DSSetDisableJobHandler(self, handleJob, value):
+      self.__api.DSSetDisableJobHandler.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int]
+      self.__api.DSSetDisableJobHandler.restype  = ctypes.c_int
+
+      res = self.__api.DSSetDisableJobHandler(handleJob, value)
+
+      if res != DSAPI_ERRORS.DSJE_NOERROR:
+         return None, self.createError("DSSetDisableJobHandler", self.DSGetLastError())
+      else:
+         return 0, None
 
    # CUSTOM FUNCTIONS
    def DSLoadLibrary(self, api_lib_file):
@@ -927,6 +970,7 @@ class DSAPI_ERRORS:
    DSJE_LIMIT_REACHED          = 39134
    DSJE_BAD_CREDENTIAL         = 80011
    DSJE_PASSWORD_EXPIRED       = 80019
+   DSJE_BAD_HOST               = 81011
 
    __mapping = [
       {'token': 'DSJE_NOERROR', 'code': 0, 'msg': 'No error'},
@@ -1017,7 +1061,8 @@ class DSAPI_ERRORS:
       {'token': 'DSJE_LICENSE_EXPIRED', 'code': 39121, 'msg': 'The InfoSphere DataStage license has expired'},
       {'token': 'DSJE_LIMIT_REACHED', 'code': 39134, 'msg': 'The InfoSphere DataStage user limit has been reached'},
       {'token': 'DSJE_BAD_CREDENTIAL', 'code': 80011, 'msg': 'Incorrect system name or invalid user name or password provided'},
-      {'token': 'DSJE_PASSWORD_EXPIRED', 'code': 80019, 'msg': 'Password has expired'}
+      {'token': 'DSJE_PASSWORD_EXPIRED', 'code': 80019, 'msg': 'Password has expired'},
+      {'token': 'DSJE_BAD_HOST', 'code': 81011, 'msg': 'The host name specified is not valid, or the host is not responding'}
    ]
 
    @staticmethod
