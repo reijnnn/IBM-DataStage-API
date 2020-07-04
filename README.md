@@ -17,13 +17,33 @@ Also activation of [dsenv](https://www.ibm.com/support/knowledgecenter/en/SSZJPZ
 `cd ../IBM/InformationServer/Server/DSEngine/`  
 `. ./dsenv`
 
-## User credentials
-
-To use the DataStage API, you will need the operating system user credentials of the DataStage Engine server. By default, the `dsadm` credentials should work. Users for DataStage Director/Designer don't work.
-
 ## Getting Started
 
 Create your own `config.py` with path to DataStage API library (`vmdsapi.dll` on client or `libvmdsapi.so` on server) and configure connection's parameters.
+
+There are two types of setting login parameters
+
+1. Using operating system user credentials of [Engine tier](https://www.ibm.com/support/knowledgecenter/en/SSZJPZ_11.7.0/com.ibm.swg.im.iis.productization.iisinfsv.overview.arch.doc/topics/wsisinst_arch_engine_layer.html), by default, `dsadm`
+```
++: fast work
+-: doesn't support admin functions (DSAddProject, DSSetProjectProperty...)
+
+DS_DOMAIN_NAME = ''
+DS_USER_NAME   = 'dsadm'
+DS_PASSWORD    = 'dsadm_password'
+DS_SERVER      = 'HOST_NAME:ENGINE_TIER_PORT'
+```
+
+2. Using user credentials of [Services tier](https://www.ibm.com/support/knowledgecenter/en/SSZJPZ_11.7.0/com.ibm.swg.im.iis.productization.iisinfsv.overview.arch.doc/topics/wsisinst_arch_domain_layer.html)
+```
++: support admin functions
+-: slow work
+
+DS_DOMAIN_NAME = 'HOST_NAME:SERVICES_TIER_PORT'
+DS_USER_NAME   = 'user_login'
+DS_PASSWORD    = 'user_password'
+DS_SERVER      = 'HOST_NAME:ENGINE_TIER_PORT'
+```
 
 See Examples/config_example.py
 
