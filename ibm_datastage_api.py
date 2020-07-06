@@ -129,6 +129,19 @@ class DSREPOSUSAGE(ctypes.Structure):
    _fields_ = [("infoType", ctypes.c_int),
                ("info",     DSREPOSUSAGE_info)]
 
+class DSREPOSJOBINFO(ctypes.Structure):
+   pass
+DSREPOSJOBINFO._fields_ = [("jobname", ctypes.c_char_p),
+                           ("jobtype", ctypes.c_int),
+                           ("nextjob", ctypes.POINTER(DSREPOSJOBINFO))]
+
+class DSREPOSINFO_info(ctypes.Union):
+   _fields_ = [("jobs", ctypes.POINTER(DSREPOSJOBINFO))]
+
+class DSREPOSINFO(ctypes.Structure):
+   _fields_ = [("infoType", ctypes.c_int),
+               ("info",     DSREPOSINFO_info)]
+
 # API INTERFACE
 class DSAPI:
    # API Version
@@ -600,15 +613,29 @@ class DSAPI:
       self.__api.DSGetReposUsage.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(DSREPOSUSAGE)]
       self.__api.DSGetReposUsage.restype  = ctypes.c_int
 
-      reposInfo = DSREPOSUSAGE()
-      res = self.__api.DSGetReposUsage(handleProj, relationshipType, self.encodeString(objectName), recursive, ctypes.pointer(reposInfo))
+      reposUsage = DSREPOSUSAGE()
+      res = self.__api.DSGetReposUsage(handleProj, relationshipType, self.encodeString(objectName), recursive, ctypes.pointer(reposUsage))
 
-      if res in [DSAPI_ERRORS.DSJE_REPERROR, DSAPI_ERRORS.DSJE_NO_DATASTAGE, DSAPI_ERRORS.DSJE_UNKNOWN_JOBNAME]:
-         return None, self.createError("DSGetReposUsage", self.DSGetLastError())
+      if res > 0:
+         return reposUsage.info.jobs.contents, None
       if res == 0:
          return None, None
 
-      return reposInfo.info.jobs.contents, None
+      return None, self.createError("DSGetReposUsage", self.DSGetLastError())
+
+   def DSGetReposInfo(self, handleProj, objectType, infoType, searchCriteria, startingCategory, subcategories=1):
+      self.__api.DSGetReposInfo.argtypes = [ctypes.POINTER(DSPROJECT), ctypes.c_int, ctypes.c_int, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(DSREPOSINFO)]
+      self.__api.DSGetReposInfo.restype  = ctypes.c_int
+
+      reposInfo = DSREPOSINFO()
+      res = self.__api.DSGetReposInfo(handleProj, objectType, infoType, self.encodeString(searchCriteria), self.encodeString(startingCategory), subcategories, ctypes.pointer(reposInfo))
+
+      if res > 0:
+         return reposInfo.info.jobs.contents, None
+      if res == 0:
+         return None, None
+
+      return None, self.createError("DSGetReposInfo", self.DSGetLastError())
 
    def DSLogEvent(self, handleJob, eventType, message):
       self.__api.DSLogEvent.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_int, ctypes.c_char_p, ctypes.c_char_p]

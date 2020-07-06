@@ -1,24 +1,19 @@
 # -*- coding: utf-8 -*-
 
-def print_job_dependencies(job_name, level = 0):
-
+def print_job_dependencies(job_name, level=0):
    print('    ' * level + '|----' + job_name)
 
    res, err = dsapi.DSGetReposUsage(hproj, dsapi.DSS_JOB_USES_JOB, job_name)
    if err:
-      print(err)
-      return
+      raise Exception("Can't get the job {} info: {}".format(job_name, err))
 
-   # no data found
    if res is None:
       return
 
    jobs_list = []
    while True:
-      curr_job_type = res.jobtype
-      curr_job_name = dsapi.decodeBytes(res.jobname).split("\\")[-1]
-
-      jobs_list.append(curr_job_name)
+      short_job_name = dsapi.decodeBytes(res.jobname).split("\\")[-1]
+      jobs_list.append(short_job_name)
 
       if res.nextjob:
          res = res.nextjob.contents
