@@ -36,9 +36,9 @@ try:
    print("DSJ_PARAMLIST = {}\n".format(paramList))
 
    for param in paramList:
-      paramInfo, err = dsapi.DSGetParamInfo(hjob, param)
+      paramInfo, err = dsapi.DSGetParamInfo(hjob, dsapi.decodeBytes(param))
 
-      print("paramName:   '{}'".format(param))
+      print("paramName:    {}".format(param))
       if err:
          raise Exception("Can't get the parameter info: {}".format(err))
 

@@ -93,7 +93,7 @@ try:
    dsapi.DSWaitForJob(hjob)
 
    print("Forming the report")
-   res, err = dsapi.DSMakeJobReport(hjob, 0)
+   res, err = dsapi.DSMakeJobReport(hjob, dsapi.DSJ_REPORT0)
    if err:
       raise Exception("Can't form the report: {}".format(err))
 

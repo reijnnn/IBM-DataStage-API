@@ -147,6 +147,21 @@ class DSAPI:
    # API Version
    DSAPI_VERSION = 1
 
+   # 'jobStatus' values
+   DSJS_RUNNING     = 0  # Job running
+   DSJS_RUNOK       = 1  # Job finished a normal run with no warnings
+   DSJS_RUNWARN     = 2  # Job finished a normal run with warnings
+   DSJS_RUNFAILED   = 3  # Job finished a normal run with a fatal error
+   DSJS_QUEUED      = 4  # Job queued waiting for resource allocation
+   DSJS_VALOK       = 11 # Job finished a validation run with no warnings
+   DSJS_VALWARN     = 12 # Job finished a validation run with warnings
+   DSJS_VALFAILED   = 13 # Job failed a validation run
+   DSJS_RESET       = 21 # Job finished a reset run
+   DSJS_CRASHED     = 96 # Job was stopped by some indeterminate action
+   DSJS_STOPPED     = 97 # Job was stopped by operator intervention (can't tell run type)
+   DSJS_NOTRUNNABLE = 98 # Job has not been compiled
+   DSJS_NOTRUNNING  = 99 # Any other status
+
    # DSJOBINFO 'infoType' values
    DSJ_JOBSTATUS         = 1  # Current status of the job.
    DSJ_JOBNAME           = 2  # Name of the job referenced by JobHandle.
@@ -158,19 +173,19 @@ class DSAPI:
    DSJ_USERSTATUS        = 8  # Value, if any,  set as the user status by the job.
    DSJ_JOBCONTROL        = 9  # Job control STOP/SUSPEND/RESUME
    DSJ_JOBPID            = 10 # Process id of DSD.RUN process
-   DSJ_JOBLASTTIMESTAMP  = 11  # Server date/time of job last finished: "YYYY-MM-DD HH:MM:SS"
-   DSJ_JOBINVOCATIONS    = 12  # Comma-separated list of job invocation ids
-   DSJ_JOBINTERIMSTATUS  = 13  # Current interim status of job
-   DSJ_JOBINVOCATIONID   = 14  # Invocation name of the job referenced
-   DSJ_JOBDESC           = 15  # Job description
-   DSJ_STAGELIST2        = 16  # list of stages not in DSJ.STAGELIST
-   DSJ_JOBELAPSED        = 17  # Job Elapsed time in seconds
-   DSJ_JOBEOTCOUNT       = 18
-   DSJ_JOBEOTTIMESTAMP   = 19
-   DSJ_JOBDMISERVICE     = 20  # Job is a DMI (aka WEB) service
-   DSJ_JOBMULTIINVOKABLE = 21  # Job can be multiply invoked
-   DSJ_JOBFULLDESC       = 22  # Full job description
-   DSJ_JOBRESTARTABLE    = 24  # Job can be restarted
+   DSJ_JOBLASTTIMESTAMP  = 11 # Server date/time of job last finished: "YYYY-MM-DD HH:MM:SS"
+   DSJ_JOBINVOCATIONS    = 12 # Comma-separated list of job invocation ids
+   DSJ_JOBINTERIMSTATUS  = 13 # Current interim status of job
+   DSJ_JOBINVOCATIONID   = 14 # Invocation name of the job referenced
+   DSJ_JOBDESC           = 15 # Job description
+   DSJ_STAGELIST2        = 16 # list of stages not in DSJ.STAGELIST
+   DSJ_JOBELAPSED        = 17 # Job Elapsed time in seconds
+   DSJ_JOBEOTCOUNT       = 18 # Count of EndOfTransmission blocks processed by this job so far
+   DSJ_JOBEOTTIMESTAMP   = 19 # Date/time of the last EndOfTransmission block processed by this job
+   DSJ_JOBDMISERVICE     = 20 # Job is a DMI (aka WEB) service
+   DSJ_JOBMULTIINVOKABLE = 21 # Job can be multiply invoked
+   DSJ_JOBFULLDESC       = 22 # Full job description
+   DSJ_JOBRESTARTABLE    = 24 # Job can be restarted
 
    # DSPROJECTINFO 'infoType' values
    DSJ_JOBLIST     = 1 # List of jobs in project
@@ -240,6 +255,11 @@ class DSAPI:
    DSA_PRJ_PX_DEPLOY_JOBDIR_TEMPLATE = 'PXDeployJobDirectoryTemplate'
    DSA_PRJ_PX_BASEDIR                = 'PXRemoteBaseDirectory'
    DSA_PRJ_PX_DEPLOY_GENERATE_XML    = 'PXDeployGenerateXML'
+
+   # 'reportType' values
+   DSJ_REPORT0 = 0
+   DSJ_REPORT1 = 1
+   DSJ_REPORT2 = 2
 
    def __init__(self):
       self.__api        = None
