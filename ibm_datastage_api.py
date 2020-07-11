@@ -147,7 +147,7 @@ class DSAPI:
    # API Version
    DSAPI_VERSION = 1
 
-   # 'jobStatus' values
+   # DSJOBINFO 'jobStatus' values
    DSJS_RUNNING     = 0  # Job running
    DSJS_RUNOK       = 1  # Job finished a normal run with no warnings
    DSJS_RUNWARN     = 2  # Job finished a normal run with warnings
@@ -222,6 +222,11 @@ class DSAPI:
    DSJ_PARAMTYPE_DATE      = 6
    DSJ_PARAMTYPE_TIME      = 7
 
+   # DSREPORTINFO 'reportType' values
+   DSJ_REPORT0 = 0 # Basic
+   DSJ_REPORT1 = 1 # Stage/link detail
+   DSJ_REPORT2 = 2 # Text string containing full XML report
+
    # DSREPOSUSAGEJOB 'relationshipType' values
    DSS_JOB_USES_JOB                   = 1
    DSS_JOB_USEDBY_JOB                 = 2
@@ -237,7 +242,7 @@ class DSAPI:
    DSS_JOB_MAINFRAME = 4  # list all mainframe jobs
    DSS_JOB_SEQUENCE  = 8  # list all sequence jobs
 
-   # ENVVAR 'varType' values
+   # DSAddEnvVar 'varType' values
    DSA_ENVVAR_TYPE_STRING    = 'String'
    DSA_ENVVAR_TYPE_ENCRYPTED = 'Encrypted'
 
@@ -255,11 +260,6 @@ class DSAPI:
    DSA_PRJ_PX_DEPLOY_JOBDIR_TEMPLATE = 'PXDeployJobDirectoryTemplate'
    DSA_PRJ_PX_BASEDIR                = 'PXRemoteBaseDirectory'
    DSA_PRJ_PX_DEPLOY_GENERATE_XML    = 'PXDeployGenerateXML'
-
-   # 'reportType' values
-   DSJ_REPORT0 = 0
-   DSJ_REPORT1 = 1
-   DSJ_REPORT2 = 2
 
    def __init__(self):
       self.__api        = None
