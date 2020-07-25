@@ -33,33 +33,13 @@ try:
 
    res, err = dsapi.DSGetJobInfo(hjob, dsapi.DSJ_JOBSTATUS)
    if err:
-      raise Exception("Can't get the job info: {}".format(err))
+      raise Exception("DSJ_JOBSTATUS. Can't get the job info: {}".format(err))
    print("DSJ_JOBSTATUS = {}".format(res))
 
    res, err = dsapi.DSGetJobInfo(hjob, dsapi.DSJ_PARAMLIST)
    if err:
-      raise Exception("Can't get the job info: {}".format(err))
+      raise Exception("DSJ_PARAMLIST. Can't get the job info: {}".format(err))
    print("DSJ_PARAMLIST = {}".format(res))
-
-   res, err = dsapi.DSGetJobInfo(hjob, dsapi.DSJ_JOBPID)
-   if err:
-      raise Exception("Can't get the job info: {}".format(err))
-   print("DSJ_JOBPID = {}".format(res))
-
-   res, err = dsapi.DSGetJobInfo(hjob, dsapi.DSJ_JOBSTARTTIMESTAMP)
-   if err:
-      raise Exception("Can't get the job info: {}".format(err))
-   print("DSJ_JOBSTARTTIMESTAMP = {}".format(res))
-
-   res, err = dsapi.DSGetJobInfo(hjob, dsapi.DSJ_JOBLASTTIMESTAMP)
-   if err:
-      raise Exception("Can't get the job info: {}".format(err))
-   print("DSJ_JOBLASTTIMESTAMP = {}".format(res))
-
-   res, err = dsapi.DSGetJobInfo(hjob, dsapi.DSJ_JOBRESTARTABLE)
-   if err:
-      raise Exception("Can't get the job info: {}".format(err))
-   print("DSJ_JOBRESTARTABLE = {}".format(res))
 
    print("Blocking the job {}".format(DS_JOB_NAME))
    res, err = dsapi.DSLockJob(hjob)

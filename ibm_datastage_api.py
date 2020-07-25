@@ -29,7 +29,7 @@ class DSJOBINFO_info(ctypes.Union):
                ("jobStartTime",      time_t),
                ("jobWaveNumber",     ctypes.c_int),
                ("userStatus",        ctypes.c_char_p),
-               ("stageList",         ctypes.c_char_p),
+               ("stageList",         ctypes.POINTER(ctypes.c_char)),
                ("paramList",         ctypes.POINTER(ctypes.c_char)),
                ("jobName",           ctypes.c_char_p),
                ("jobControl",        ctypes.c_int),
@@ -39,8 +39,8 @@ class DSJOBINFO_info(ctypes.Union):
                ("jobInterimStatus",  ctypes.c_int),
                ("jobInvocationId",   ctypes.c_char_p),
                ("jobDesc",           ctypes.c_char_p),
-               ("stageList2",        ctypes.c_char_p),
-               ("jobElapsed",        ctypes.c_char_p),
+               ("stageList2",        ctypes.POINTER(ctypes.c_char)),
+               ("jobElapsed",        ctypes.c_int),
                ("jobDMIService",     ctypes.c_int),
                ("jobMultiInvokable", ctypes.c_int),
                ("jobFullDesc",       ctypes.c_char_p),
@@ -142,6 +142,42 @@ class DSREPOSINFO(ctypes.Structure):
    _fields_ = [("infoType", ctypes.c_int),
                ("info",     DSREPOSINFO_info)]
 
+class DSSTAGEINFO_info(ctypes.Union):
+   _fields_ = [("lastError",      DSLOGDETAIL),
+               ("typeName",       ctypes.c_char_p),
+               ("inRowNum",       ctypes.c_int),
+               ("linkList",       ctypes.POINTER(ctypes.c_char)),
+               ("stageName",      ctypes.c_char_p),
+               ("varList",        ctypes.POINTER(ctypes.c_char)),
+               ("stageStartTime", time_t),
+               ("stageEndTime",   time_t),
+               ("linkTypes",      ctypes.POINTER(ctypes.c_char)),
+               ("stageDesc",      ctypes.c_char_p),
+               ("instList",       ctypes.POINTER(ctypes.c_char)),
+               ("cpuList",        ctypes.POINTER(ctypes.c_char)),
+               ("stageElapsed",   ctypes.c_char_p),
+               ("pidList",        ctypes.POINTER(ctypes.c_char)),
+               ("stageStatus",    ctypes.c_int),
+               ("custInfoList",   ctypes.POINTER(ctypes.c_char))]
+
+class DSSTAGEINFO(ctypes.Structure):
+   _fields_ = [("infoType", ctypes.c_int),
+               ("info",     DSSTAGEINFO_info)]
+
+class DSLINKINFO_info(ctypes.Union):
+   _fields_ = [("lastError",    DSLOGDETAIL),
+               ("rowCount",     ctypes.c_int),
+               ("linkName",     ctypes.c_char_p),
+               ("linkSQLState", ctypes.c_char_p),
+               ("linkDBMSCode", ctypes.c_char_p),
+               ("linkDesc",     ctypes.c_char_p),
+               ("linkedStage",  ctypes.c_char_p),
+               ("rowCountList", ctypes.POINTER(ctypes.c_char))]
+
+class DSLINKINFO(ctypes.Structure):
+   _fields_ = [("infoType", ctypes.c_int),
+               ("info",     DSLINKINFO_info)]
+
 # API INTERFACE
 class DSAPI:
    # API Version
@@ -194,6 +230,38 @@ class DSAPI:
    DSJ_INSTALLTAG  = 4 # Install tag of the server DSEngine
    DSJ_TCPPORT     = 5 # TCP port    of the server DSEngine
    DSJ_PROJECTPATH = 6 # Directory path of current project
+
+   # DSSTAGEINFO 'infoType' values
+   DSJ_LINKLIST            = 1  # List of stage link names
+   DSJ_STAGELASTERR        = 2  # Last error message reported from any link of the stage.
+   DSJ_STAGENAME           = 3  # Actual name of stage
+   DSJ_STAGETYPE           = 4  # Stage type name.
+   DSJ_STAGEINROWNUM       = 5  # Primary links input row number.
+   DSJ_VARLIST             = 6  # List of stage variable names
+   DSJ_STAGESTARTTIMESTAMP = 7  # Date and time when stage started
+   DSJ_STAGEENDTIMESTAMP   = 8  # Date and time when stage finished
+   DSJ_STAGEDESC           = 9  # Stage Description
+   DSJ_STAGEINST           = 10 # Comma-seperated list of stage instance ids
+   DSJ_STAGECPU            = 11 # Comma-seperated list of stage instance CPU in seconds
+   DSJ_LINKTYPES           = 12 # Comma-seperated list of link types
+   DSJ_STAGEELAPSED        = 13 # Stage elapsed time in seconds
+   DSJ_STAGEPID            = 14 # Comma-seperated list of stage instance PIDs
+   DSJ_STAGESTATUS         = 15 # Stage status
+   DSJ_STAGEEOTCOUNT       = 16 # Count of EndOfTransmission blocks processed by this stage so far.
+   DSJ_STAGEEOTTIMESTAMP   = 17 # Data/time of last EndOfTransmission block received by this stage.
+   DSJ_CUSTINFOLIST        = 18 # List of custom info names
+
+   # DSLINKINFO 'infoType' values
+   DSJ_LINKLASTERR     = 1  # Last error message reported by link.
+   DSJ_LINKNAME        = 2  # Actual name of link
+   DSJ_LINKROWCOUNT    = 3  # Number of rows that have passed down the link.
+   DSJ_LINKSQLSTATE    = 4  # SQLSTATE value from Last error message
+   DSJ_LINKDBMSCODE    = 5  # DBMSCODE value from Last error message
+   DSJ_LINKDESC        = 6  # Link description
+   DSJ_LINKSTAGE       = 7  # Stage at other end of link
+   DSJ_INSTROWCOUNT    = 8  # Comma seperated list of rowcounts for each stage instance
+   DSJ_LINKEOTROWCOUNT = 9  # Row count since last EndOfTransmission block.
+   DSJ_LINKEXTROWCOUNT = 10 # Extended rowcount, using strings
 
    # DSLOGDETAILFULL 'eventType' values
    DSJ_LOGINFO     = 1  # Information message.
@@ -374,7 +442,7 @@ class DSAPI:
          if infoType == self.DSJ_PARAMLIST:
             return self.charPointerToList(jobInfo.info.paramList), None
          if infoType == self.DSJ_STAGELIST:
-            return jobInfo.info.stageList, None
+            return self.charPointerToList(jobInfo.info.stageList), None
          if infoType == self.DSJ_USERSTATUS:
             return jobInfo.info.userStatus, None
          if infoType == self.DSJ_JOBCONTROL:
@@ -392,7 +460,7 @@ class DSAPI:
          if infoType == self.DSJ_JOBDESC:
             return jobInfo.info.jobDesc, None
          if infoType == self.DSJ_STAGELIST2:
-            return jobInfo.info.stageList2, None
+            return self.charPointerToList(jobInfo.info.stageList2), None
          if infoType == self.DSJ_JOBELAPSED:
             return jobInfo.info.jobElapsed, None
          if infoType == self.DSJ_JOBDMISERVICE:
@@ -403,6 +471,82 @@ class DSAPI:
             return jobInfo.info.jobFullDesc, None
          if infoType == self.DSJ_JOBRESTARTABLE:
             return jobInfo.info.jobRestartable, None
+         else:
+            return '', None
+
+   def DSGetStageInfo(self, handleJob, stageName, infoType):
+      self.__api.DSGetStageInfo.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(DSSTAGEINFO)]
+      self.__api.DSGetStageInfo.restype  = ctypes.c_int
+
+      stageInfo = DSSTAGEINFO()
+      res = self.__api.DSGetStageInfo(handleJob, self.encodeString(stageName), infoType, ctypes.pointer(stageInfo))
+
+      if res != DSAPI_ERRORS.DSJE_NOERROR:
+         return None, self.createError("DSGetStageInfo", self.DSGetLastError())
+      else:
+         if infoType == self.DSJ_LINKLIST:
+            return self.charPointerToList(stageInfo.info.linkList), None
+         if infoType == self.DSJ_STAGELASTERR:
+            return stageInfo.info.lastError, None
+         if infoType == self.DSJ_STAGENAME:
+            return stageInfo.info.stageName, None
+         if infoType == self.DSJ_STAGETYPE:
+            return stageInfo.info.typeName, None
+         if infoType == self.DSJ_STAGEINROWNUM:
+            return stageInfo.info.inRowNum, None
+         if infoType == self.DSJ_VARLIST:
+            return self.charPointerToList(stageInfo.info.varList), None
+         if infoType == self.DSJ_STAGESTARTTIMESTAMP:
+            return stageInfo.info.stageStartTime, None
+         if infoType == self.DSJ_STAGEENDTIMESTAMP:
+            return stageInfo.info.stageEndTime, None
+         if infoType == self.DSJ_STAGEDESC:
+            return stageInfo.info.stageDesc, None
+         if infoType == self.DSJ_STAGEINST:
+            return self.charPointerToList(stageInfo.info.instList), None
+         if infoType == self.DSJ_STAGECPU:
+            return self.charPointerToList(stageInfo.info.cpuList), None
+         if infoType == self.DSJ_LINKTYPES:
+            return self.charPointerToList(stageInfo.info.linkTypes), None
+         if infoType == self.DSJ_STAGEELAPSED:
+            return stageInfo.info.stageElapsed, None
+         if infoType == self.DSJ_STAGEPID:
+            return self.charPointerToList(stageInfo.info.pidList), None
+         if infoType == self.DSJ_STAGESTATUS:
+            return stageInfo.info.stageStatus, None
+         if infoType == self.DSJ_CUSTINFOLIST:
+            return self.charPointerToList(stageInfo.info.custInfoList), None
+         else:
+            return '', None
+
+   def DSGetLinkInfo(self, handleJob, stageName, linkName, infoType):
+      self.__api.DSGetLinkInfo.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(DSLINKINFO)]
+      self.__api.DSGetLinkInfo.restype  = ctypes.c_int
+
+      linkInfo = DSLINKINFO()
+      res = self.__api.DSGetLinkInfo(handleJob, self.encodeString(stageName), self.encodeString(linkName), infoType, ctypes.pointer(linkInfo))
+
+      if res != DSAPI_ERRORS.DSJE_NOERROR:
+         return None, self.createError("DSGetLinkInfo", self.DSGetLastError())
+      else:
+         if infoType == self.DSJ_LINKLASTERR:
+            return linkInfo.info.lastError, None
+         if infoType == self.DSJ_LINKNAME:
+            return linkInfo.info.linkName, None
+         if infoType == self.DSJ_LINKROWCOUNT:
+            return linkInfo.info.rowCount, None
+         if infoType == self.DSJ_LINKSQLSTATE:
+            return linkInfo.info.linkSQLState, None
+         if infoType == self.DSJ_LINKDBMSCODE:
+            return linkInfo.info.linkDBMSCode, None
+         if infoType == self.DSJ_LINKDESC:
+            return linkInfo.info.linkDesc, None
+         if infoType == self.DSJ_LINKSTAGE:
+            return linkInfo.info.linkedStage, None
+         if infoType == self.DSJ_INSTROWCOUNT:
+            return self.charPointerToList(linkInfo.info.rowCountList), None
+         if infoType == self.DSJ_LINKEXTROWCOUNT:
+            return self.charPointerToList(linkInfo.info.rowCountList), None
          else:
             return '', None
 
@@ -767,11 +911,14 @@ class DSAPI:
       else:
          return jobName, None
 
-   def DSServerMessage(self, defMsg, prms=[], msgIdStr='', sizeMessage=1000):
+   def DSServerMessage(self, defMsg, prms=None, msgIdStr='', sizeMessage=1000):
       # How to use messages from the msg.text file?
       # Where to find another message ids? For example DSTAGE_JSG_M_0001-DSTAGE_JSG_M_0075
       # Why [L] and [E] are not replaced?
       # What errors are possible?
+      if prms is None:
+         prms = []
+
       if not isinstance(prms, list):
          return None, self.createError("DSServerMessage", "Variable prms must be a list")
 

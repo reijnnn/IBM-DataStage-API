@@ -41,7 +41,7 @@ try:
    print("Reading logs")
    event_id = log_event.eventId
    while True:
-      log_detail, err = dsapi.DSGetLogEntryFull(hjob, event_id)
+      log_detail, err = dsapi.DSGetLogEntry(hjob, event_id)
       if err:
          raise Exception("Can't get details for eventId = {}: {}".format(event_id, err))
 

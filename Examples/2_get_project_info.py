@@ -26,30 +26,21 @@ try:
 
    print("Getting an information about the project")
 
-   res, err = dsapi.DSGetProjectInfo(hproj, dsapi.DSJ_PROJECTNAME)
-   if err:
-      raise Exception("Can't get the project info: {}".format(err))
-   print("DSJ_PROJECTNAME = {}".format(res))
+   infoTypes_list = [
+      (dsapi.DSJ_JOBLIST,     'DSJ_JOBLIST'),
+      (dsapi.DSJ_PROJECTNAME, 'DSJ_PROJECTNAME'),
+      (dsapi.DSJ_HOSTNAME,    'DSJ_HOSTNAME'),
+      (dsapi.DSJ_INSTALLTAG,  'DSJ_INSTALLTAG'),
+      (dsapi.DSJ_TCPPORT,     'DSJ_TCPPORT'),
+      (dsapi.DSJ_PROJECTPATH, 'DSJ_PROJECTPATH')
+   ]
 
-   res, err = dsapi.DSGetProjectInfo(hproj, dsapi.DSJ_HOSTNAME)
-   if err:
-      raise Exception("Can't get the project info: {}".format(err))
-   print("DSJ_HOSTNAME = {}".format(res))
-
-   res, err = dsapi.DSGetProjectInfo(hproj, dsapi.DSJ_TCPPORT)
-   if err:
-      raise Exception("Can't get the project info: {}".format(err))
-   print("DSJ_TCPPORT = {}".format(res))
-
-   res, err = dsapi.DSGetProjectInfo(hproj, dsapi.DSJ_PROJECTPATH)
-   if err:
-      raise Exception("Can't get the project info: {}".format(err))
-   print("DSJ_PROJECTPATH = {}".format(res))
-
-   res, err = dsapi.DSGetProjectInfo(hproj, dsapi.DSJ_JOBLIST)
-   if err:
-      raise Exception("Can't get the project info: {}".format(err))
-   print("DSJ_JOBLIST = {}".format(res))
+   for infoType, infoName in infoTypes_list:
+      res, err = dsapi.DSGetProjectInfo(hproj, infoType)
+      if err:
+         print("{}. Can't get the project info: {}".format(infoName, err))
+      else:
+         print("{} = {}".format(infoName, res))
 
    print("Closing the project")
    dsapi.DSCloseProject(hproj)
