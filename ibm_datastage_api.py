@@ -963,9 +963,9 @@ class DSAPI:
       self.__api.DSGetWLMEnabled.argtypes = []
       self.__api.DSGetWLMEnabled.restype  = ctypes.c_int
 
-      WLMEnabled = self.__api.DSGetWLMEnabled()
+      wlmEnabled = self.__api.DSGetWLMEnabled()
 
-      if not WLMEnabled:
+      if not wlmEnabled:
          return None, self.createError("DSGetWLMEnabled", self.DSGetLastError())
       else:
          return 0, None
