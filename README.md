@@ -17,6 +17,11 @@ Also activation of [dsenv](https://www.ibm.com/support/knowledgecenter/en/SSZJPZ
 `cd ../IBM/InformationServer/Server/DSEngine/`  
 `. ./dsenv`
 
+## Installation
+```
+pip install IBM-DataStage-API
+```
+
 ## Getting Started
 
 Create your own `config.py` with path to DataStage API library (`vmdsapi.dll` on a client or `libvmdsapi.so` on a server) and configure connection's parameters.
