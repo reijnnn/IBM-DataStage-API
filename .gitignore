@@ -4,3 +4,14 @@ __pycache__/
 Examples/config.py
 Examples/*.pyc
 Examples/__pycache__/
+
+.env/
+env/
+.venv/
+venv/
+
+.idea/
+
+build/
+dist/
+*.egg-info
