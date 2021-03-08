@@ -1,4 +1,6 @@
 # IBM-DataStage-API
+[![PyPi Version](https://img.shields.io/pypi/v/IBM-DataStage-API.svg)](https://pypi.python.org/pypi/IBM-DataStage-API)
+![Python versions](https://img.shields.io/pypi/pyversions/IBM-DataStage-API.svg)
 
 IBM-DataStage-API on Python.
 Please read [InfoSphere DataStage Development Kit](https://www.ibm.com/support/knowledgecenter/en/SSZJPZ_11.7.0/com.ibm.swg.im.iis.ds.cliapi.ref.doc/topics/r_dsvjbref_WebSphere_DataStage_Development_Kit.html) to find details.
