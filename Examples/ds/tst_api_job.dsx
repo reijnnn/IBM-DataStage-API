@@ -45,6 +45,14 @@ BEGIN DSJOB
          ParamLength "0"
          ParamScale "0"
       END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "p_int_num_of_records"
+         Prompt "p_int_num_of_records"
+         Default "5"
+         ParamType "2"
+         ParamLength "0"
+         ParamScale "0"
+      END DSSUBRECORD
       MetaBag "CMetaProperty"
       BEGIN DSSUBRECORD
          Owner "APT"
@@ -101,9 +109,8 @@ generator
 -schema record
 (
   gen_x:int32;
-  gen_y:int32;
 )
--records 2
+-records [&"p_int_num_of_records"]
 
 ## General options
 [ident('RG_TST'); jobmon_ident('RG_TST')]
@@ -234,37 +241,11 @@ transform
       END DSSUBRECORD
       BEGIN DSSUBRECORD
          Name "records"
-         Value "2"
+         Value "#p_int_num_of_records#"
       END DSSUBRECORD
       Columns "COutputColumn"
       BEGIN DSSUBRECORD
          Name "gen_x"
-         SqlType "4"
-         Precision "0"
-         Scale "0"
-         Nullable "0"
-         KeyPosition "0"
-         DisplaySize "0"
-         Group "0"
-         SortKey "0"
-         SortType "0"
-         AllowCRLF "0"
-         LevelNo "0"
-         Occurs "0"
-         PadNulls "0"
-         SignOption "0"
-         SortingOrder "0"
-         ArrayHandling "0"
-         SyncIndicator "0"
-         PadChar ""
-         ExtendedPrecision "0"
-         TaggedSubrec "0"
-         OccursVarying "0"
-         PKeyIsCaseless "0"
-         SCDPurpose "0"
-      END DSSUBRECORD
-      BEGIN DSSUBRECORD
-         Name "gen_y"
          SqlType "4"
          Precision "0"
          Scale "0"
@@ -382,7 +363,7 @@ transform
          Name "TrxGenCode"
          Value =+=+=+=
 //
-// Generated file to implement the V0S3_tst_api_job_TR_TEST transform operator.
+// Generated file to implement the V0S3_tst_api_job_TR_TST transform operator.
 //
 
 // define our input/output link names
@@ -399,14 +380,27 @@ initialize {
 	int8 RowRejected0;
 	int8 NullSetVar0;
 
+	// declare our intermediate variables for this section
+	ustring InterVar0_0;
+	ustring InterVar0_1;
+	ustring InterVar0_2;
+	ustring InterVar0_3;
+	ustring InterVar0_4;
+
+	// initialise constant values which require conversion
+	InterVar0_1 = "SUMVALUEINSTANCE";
+	InterVar0_3 = "Sum value of all records passed through the transformer stage instance";
 	// Stage variable declaration and initialisation
 	int32 StageVar0_APIVERSION;
 	StageVar0_APIVERSION = p_api_version;
+	int32 StageVar0_SUMVALUEINSTANCE;
+	StageVar0_SUMVALUEINSTANCE = 0;
 }
 
 mainloop {
 
 	// evaluate the stage variables first
+	StageVar0_SUMVALUEINSTANCE = (LNK_TR.gen_x + StageVar0_SUMVALUEINSTANCE);
 
 	// initialise the rejected row variable
 	RowRejected0 = 1;
@@ -418,6 +412,10 @@ mainloop {
 }
 
 finish {
+InterVar0_0 = InterVar0_1;
+InterVar0_2 = InterVar0_3;
+InterVar0_4 = StageVar0_SUMVALUEINSTANCE;
+u_set_custom_summary_info(InterVar0_0, InterVar0_2, InterVar0_4);
 }
 
 =+=+=+=
@@ -461,8 +459,29 @@ TR_TST
          ColScale "0"
          ExtendedPrecision "0"
       END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SUMVALUEINSTANCE"
+         Description "Sum value of all records passed through the transformer stage instance"
+         Expression "LNK_TR.gen_x + SUMVALUEINSTANCE"
+         InitialValue "0"
+         SqlType "4"
+         ParsedExpression "LNK_TR.gen_x + SUMVALUEINSTANCE"
+         SourceColumn "LNK_TR.gen_x"
+         StageVars "SUMVALUEINSTANCE"
+         Precision "0"
+         ColScale "0"
+         ExtendedPrecision "0"
+      END DSSUBRECORD
+      StageTriggers "CStageTrigger"
+      BEGIN DSSUBRECORD
+         TriggerType "1"
+         RoutineName "SetCustomSummaryInfo"
+         Arg1Expression "\"SUMVALUEINSTANCE\""
+         Arg2Expression "\"Sum value of all records passed through the transformer stage instance\""
+         Arg3Expression "SUMVALUEINSTANCE"
+      END DSSUBRECORD
       StageVarsMinimised "0"
-      LoopVarsMaximised "0"
+      LoopVarsMaximised "1"
       MaxLoopIterations "0"
    END DSRECORD
    BEGIN DSRECORD
@@ -485,7 +504,6 @@ TR_TST
 record
 (
   gen_x:int32;
-  gen_y:int32;
 )
 =+=+=+=
       END DSSUBRECORD
@@ -560,35 +578,6 @@ record
          PKeyIsCaseless "0"
          SCDPurpose "0"
       END DSSUBRECORD
-      BEGIN DSSUBRECORD
-         Name "gen_y"
-         SqlType "4"
-         Precision "0"
-         Scale "0"
-         Nullable "0"
-         KeyPosition "0"
-         DisplaySize "0"
-         Derivation "LNK_TR.gen_y"
-         Group "0"
-         ParsedDerivation "LNK_TR.gen_y"
-         SourceColumn "LNK_TR.gen_y"
-         SortKey "0"
-         SortType "0"
-         AllowCRLF "0"
-         LevelNo "0"
-         Occurs "0"
-         PadNulls "0"
-         SignOption "0"
-         SortingOrder "0"
-         ArrayHandling "0"
-         SyncIndicator "0"
-         PadChar ""
-         ExtendedPrecision "0"
-         TaggedSubrec "0"
-         OccursVarying "0"
-         PKeyIsCaseless "0"
-         SCDPurpose "0"
-      END DSSUBRECORD
       MetaBag "CMetaProperty"
       BEGIN DSSUBRECORD
          Owner "APT"
@@ -598,9 +587,28 @@ record
 (
   api_version:string[];
   gen_x:int32;
-  gen_y:int32;
 )
 =+=+=+=
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "DiskWriteInc"
+         Value "1048576"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "BufFreeRun"
+         Value "50"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "MaxMemBufSize"
+         Value "3145728"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "QueueUpperSize"
+         Value "0"
       END DSSUBRECORD
       LeftTextPos "638"
       TopTextPos "223"

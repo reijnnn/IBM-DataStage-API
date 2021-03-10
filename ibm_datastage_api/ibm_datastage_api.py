@@ -23,7 +23,8 @@ from ibm_datastage_api.ibm_datastage_api_structures import (
     DSREPOSINFO,
     DSSTAGEINFO,
     DSLINKINFO,
-    DSVARINFO
+    DSVARINFO,
+    DSCUSTINFO
 )
 
 from ibm_datastage_api.ibm_datastage_api_errors import (
@@ -118,6 +119,10 @@ class DSAPI:
     # DSVARINFO 'infoType' values
     DSJ_VARVALUE = 1  # Stage variable value
     DSJ_VARDESC = 2  # Stage variable description
+
+    # DSCUSTINFO 'infoType' values
+    DSJ_CUSTINFOVALUE = 1  # Custom info value
+    DSJ_CUSTINFODESC = 2  # Custom info description
 
     # DSLOGDETAILFULL 'eventType' values
     DSJ_LOGINFO = 1  # Information message.
@@ -426,6 +431,25 @@ class DSAPI:
                 return varInfo.info.varValue, None
             if infoType == self.DSJ_VARDESC:
                 return varInfo.info.varDesc, None
+            else:
+                return '', None
+
+    def DSGetCustInfo(self, handleJob, stageName, custInfoName, infoType):
+        self.__api.DSGetCustInfo.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int,
+                                             ctypes.POINTER(DSCUSTINFO)]
+        self.__api.DSGetCustInfo.restype = ctypes.c_int
+
+        custInfo = DSCUSTINFO()
+        res = self.__api.DSGetCustInfo(handleJob, encode_string(stageName), encode_string(custInfoName), infoType,
+                                       ctypes.pointer(custInfo))
+
+        if res != DSAPIERROR.DSJE_NOERROR:
+            return None, DSAPIERROR.create_error("DSGetCustInfo", self.DSGetLastError())
+        else:
+            if infoType == self.DSJ_CUSTINFOVALUE:
+                return custInfo.info.custInfoValue, None
+            if infoType == self.DSJ_CUSTINFODESC:
+                return custInfo.info.custInfoDesc, None
             else:
                 return '', None
 

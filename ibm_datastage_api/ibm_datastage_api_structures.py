@@ -211,3 +211,13 @@ class _DSVARINFO(ctypes.Union):
 class DSVARINFO(ctypes.Structure):
     _fields_ = [("infoType", ctypes.c_int),
                 ("info", _DSVARINFO)]
+
+
+class _DSCUSTINFO(ctypes.Union):
+    _fields_ = [("custInfoValue", ctypes.c_char_p),
+                ("custInfoDesc", ctypes.c_char_p)]
+
+
+class DSCUSTINFO(ctypes.Structure):
+    _fields_ = [("infoType", ctypes.c_int),
+                ("info", _DSCUSTINFO)]
