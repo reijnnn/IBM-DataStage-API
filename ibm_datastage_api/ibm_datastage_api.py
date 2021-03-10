@@ -22,7 +22,8 @@ from ibm_datastage_api.ibm_datastage_api_structures import (
     DSREPOSUSAGE,
     DSREPOSINFO,
     DSSTAGEINFO,
-    DSLINKINFO
+    DSLINKINFO,
+    DSVARINFO
 )
 
 from ibm_datastage_api.ibm_datastage_api_errors import (
@@ -113,6 +114,10 @@ class DSAPI:
     DSJ_INSTROWCOUNT = 8  # Comma seperated list of rowcounts for each stage instance
     DSJ_LINKEOTROWCOUNT = 9  # Row count since last EndOfTransmission block.
     DSJ_LINKEXTROWCOUNT = 10  # Extended rowcount, using strings
+
+    # DSVARINFO 'infoType' values
+    DSJ_VARVALUE = 1  # Stage variable value
+    DSJ_VARDESC = 2  # Stage variable description
 
     # DSLOGDETAILFULL 'eventType' values
     DSJ_LOGINFO = 1  # Information message.
@@ -402,6 +407,25 @@ class DSAPI:
                 return convert_char_p_to_list(linkInfo.info.rowCountList), None
             if infoType == self.DSJ_LINKEXTROWCOUNT:
                 return convert_char_p_to_list(linkInfo.info.rowCountList), None
+            else:
+                return '', None
+
+    def DSGetVarInfo(self, handleJob, stageName, varName, infoType):
+        self.__api.DSGetVarInfo.argtypes = [ctypes.POINTER(DSJOB), ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int,
+                                            ctypes.POINTER(DSVARINFO)]
+        self.__api.DSGetVarInfo.restype = ctypes.c_int
+
+        varInfo = DSVARINFO()
+        res = self.__api.DSGetVarInfo(handleJob, encode_string(stageName), encode_string(varName), infoType,
+                                      ctypes.pointer(varInfo))
+
+        if res != DSAPIERROR.DSJE_NOERROR:
+            return None, DSAPIERROR.create_error("DSGetVarInfo", self.DSGetLastError())
+        else:
+            if infoType == self.DSJ_VARVALUE:
+                return varInfo.info.varValue, None
+            if infoType == self.DSJ_VARDESC:
+                return varInfo.info.varDesc, None
             else:
                 return '', None
 

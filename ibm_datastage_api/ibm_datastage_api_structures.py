@@ -201,3 +201,13 @@ class _DSLINKINFO(ctypes.Union):
 class DSLINKINFO(ctypes.Structure):
     _fields_ = [("infoType", ctypes.c_int),
                 ("info", _DSLINKINFO)]
+
+
+class _DSVARINFO(ctypes.Union):
+    _fields_ = [("varValue", ctypes.c_char_p),
+                ("varDesc", ctypes.c_char_p)]
+
+
+class DSVARINFO(ctypes.Structure):
+    _fields_ = [("infoType", ctypes.c_int),
+                ("info", _DSVARINFO)]
