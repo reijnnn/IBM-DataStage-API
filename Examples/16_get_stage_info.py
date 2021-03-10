@@ -25,7 +25,7 @@ try:
 
     print("Getting an information about the stage of the job")
 
-    DS_JOB_STAGE_NAME = 'Transformer_0'
+    DS_JOB_STAGE_NAME = 'TR_TST'
 
     infoTypes_list = [
         (dsapi.DSJ_LINKLIST, 'DSJ_LINKLIST'),

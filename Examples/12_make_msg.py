@@ -28,28 +28,28 @@ try:
     if err:
         raise Exception("Can't block the job: {}".format(err))
 
-    DS_JOB_PARAM_NAME = 'bad_param_name'
-    DS_JOB_PARAM_VALUE = 'bad_param_value'
+    DS_JOB_STR_PARAM_NAME = 'p_str_fake'
+    DS_JOB_STR_PARAM_VALUE = 'string fake param value'
 
     print("Setting launch parameters")
     job_param = DSPARAM()
     job_param.paramType = dsapi.DSJ_PARAMTYPE_STRING
-    job_param.paramValue.pString = encode_string(DS_JOB_PARAM_VALUE)
-    _, err = dsapi.DSSetParam(hjob, DS_JOB_PARAM_NAME, job_param)
+    job_param.paramValue.pString = encode_string(DS_JOB_STR_PARAM_VALUE)
+    _, err = dsapi.DSSetParam(hjob, DS_JOB_STR_PARAM_NAME, job_param)
     if err:
         print("Can't set the parameter: {}".format(err))
 
     last_err_code = err['code']
 
     print('Preparing message with your own template')
-    res, err = dsapi.DSServerMessage('Error calling DSSetParam(%1), code=%2[E]', [DS_JOB_PARAM_NAME, last_err_code])
+    res, err = dsapi.DSServerMessage('Error calling DSSetParam(%1), code=%2[E]', [DS_JOB_STR_PARAM_NAME, last_err_code])
     if err:
         print("Can't prepare the message: {}".format(err))
     else:
         print(res)
 
     print('Preparing message using the message id = DSTAGE_JSG_M_0002 and the InfoSphere DataStage message file')
-    res, err = dsapi.DSServerMessage('', [DS_JOB_PARAM_NAME, last_err_code], 'DSTAGE_JSG_M_0002')
+    res, err = dsapi.DSServerMessage('', [DS_JOB_STR_PARAM_NAME, last_err_code], 'DSTAGE_JSG_M_0002')
     if err:
         print("Can't prepare the message: {}".format(err))
     else:

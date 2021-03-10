@@ -20,7 +20,7 @@ try:
 
     print(res)
 
-    DS_NEW_PROJECT_NAME = 'dsdev_api_project'
+    DS_NEW_PROJECT_NAME = 'tst_api_new_project'
 
     print("Creating the project {}".format(DS_NEW_PROJECT_NAME))
     _, err = dsapi.DSAddProject(DS_NEW_PROJECT_NAME)

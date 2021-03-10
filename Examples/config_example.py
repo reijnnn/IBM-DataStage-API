@@ -21,8 +21,8 @@ DS_PASSWORD = 'user_password'
 DS_SERVER = 'HOST_NAME:ENGINE_TIER_PORT'
 
 # Project/Job
-DS_PROJECT = 'dsdev_project'
-DS_JOB_NAME = 'dsjob_name'
+DS_PROJECT = 'tst_api_project'
+DS_JOB_NAME = 'tst_api_job'
 
 # Full path to API library (vmdsapi.dll or libvmdsapi.so)
 API_LIB_FILE = '../IBM/InformationServer/Clients/Classic/vmdsapi.dll'

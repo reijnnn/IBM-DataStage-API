@@ -40,18 +40,34 @@ try:
     if err:
         raise Exception("Can't block the job: {}".format(err))
 
+    DS_JOB_STR_PARAM_NAME = 'p_str'
+    DS_JOB_STR_PARAM_VALUE = 'string param value'
+
     print("Setting launch parameters")
     job_param = DSPARAM()
     job_param.paramType = dsapi.DSJ_PARAMTYPE_STRING
-    job_param.paramValue.pString = encode_string('string value')
-    res, err = dsapi.DSSetParam(hjob, 'param_str', job_param)
+    job_param.paramValue.pString = encode_string(DS_JOB_STR_PARAM_VALUE)
+    res, err = dsapi.DSSetParam(hjob, DS_JOB_STR_PARAM_NAME, job_param)
     if err:
         print("Can't set the parameter: {}".format(err))
 
+    DS_JOB_STR_ENCRYPTED_PARAM_NAME = 'p_str_encrypted'
+    DS_JOB_STR_ENCRYPTED_PARAM_VALUE = 'string encrypted param value'
+
     job_param = DSPARAM()
     job_param.paramType = dsapi.DSJ_PARAMTYPE_ENCRYPTED
-    job_param.paramValue.pEncrypt = encode_string('string encrypted value')
-    res, err = dsapi.DSSetParam(hjob, 'param_encrypted', job_param)
+    job_param.paramValue.pEncrypt = encode_string(DS_JOB_STR_ENCRYPTED_PARAM_VALUE)
+    res, err = dsapi.DSSetParam(hjob, DS_JOB_STR_ENCRYPTED_PARAM_NAME, job_param)
+    if err:
+        print("Can't set the parameter: {}".format(err))
+
+    DS_JOB_STR_FAKE_PARAM_NAME = 'p_str_fake'
+    DS_JOB_STR_FAKE_PARAM_VALUE = 'string fake param value'
+
+    job_param = DSPARAM()
+    job_param.paramType = dsapi.DSJ_PARAMTYPE_ENCRYPTED
+    job_param.paramValue.pEncrypt = encode_string(DS_JOB_STR_FAKE_PARAM_VALUE)
+    res, err = dsapi.DSSetParam(hjob, DS_JOB_STR_FAKE_PARAM_NAME, job_param)
     if err:
         print("Can't set the parameter: {}".format(err))
 

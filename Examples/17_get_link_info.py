@@ -25,8 +25,8 @@ try:
 
     print("Getting an information about the link of the stage")
 
-    DS_JOB_STAGE_NAME = 'Transformer_0'
-    DS_JOB_STAGE_LINK_NAME = 'DSLink2'
+    DS_JOB_STAGE_NAME = 'TR_TST'
+    DS_JOB_STAGE_LINK_NAME = 'LNK_TR'
 
     infoTypes_list = [
         (dsapi.DSJ_LINKLASTERR, 'DSJ_LINKLASTERR'),

@@ -1,0 +1,609 @@
+BEGIN HEADER
+   CharacterSet "CP1251"
+   ExportingTool "IBM InfoSphere DataStage Export"
+   ToolVersion "8"
+   ServerName "tst"
+   ToolInstanceID "tst_api_project"
+   MDISVersion "1.0"
+   Date "2021-03-10"
+   Time "13.37.00"
+   ServerVersion "9.1"
+END HEADER
+BEGIN DSJOB
+   Identifier "tst_api_job"
+   DateModified "2021-03-10"
+   TimeModified "13.37.00"
+   BEGIN DSRECORD
+      Identifier "ROOT"
+      OLEType "CJobDefn"
+      Readonly "0"
+      Name "tst_api_job"
+      NextID "1"
+      Container "V0"
+      JobVersion "56.0.0"
+      ControlAfterSubr "0"
+      Parameters "CParameters"
+      BEGIN DSSUBRECORD
+         Name "p_api_version"
+         Prompt "p_api_version"
+         Default "1"
+         ParamType "2"
+         ParamLength "0"
+         ParamScale "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "p_str"
+         Prompt "p_str"
+         ParamType "0"
+         ParamLength "0"
+         ParamScale "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "p_str_encrypted"
+         Prompt "p_str_encrypted"
+         ParamType "1"
+         ParamLength "0"
+         ParamScale "0"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "AdvancedRuntimeOptions"
+         Value "#DSProjectARTOptions#"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "IdentList"
+         Value "RG_TST|PK_TST|TR_TST"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "ClientCodePage"
+         Value "1251"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TraceMode"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TraceSeq"
+         Value "1"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TraceRecords"
+         Value "100"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TraceSkip"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TracePeriod"
+         Value "1"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "RecordJobPerformanceData"
+         Value "0"
+      END DSSUBRECORD
+      NULLIndicatorPosition "0"
+      OrchestrateCode =+=+=+=
+#################################################################
+#### STAGE: RG_TST
+## Operator
+generator
+## Operator options
+-schema record
+(
+  gen_x:int32;
+  gen_y:int32;
+)
+-records 2
+
+## General options
+[ident('RG_TST'); jobmon_ident('RG_TST')]
+## Outputs
+0> [] 'RG_TST:LNK_TR.v'
+;
+
+#################################################################
+#### STAGE: PK_TST
+## Operator
+peek
+## Operator options
+-nrecs 10
+-name
+
+## General options
+[ident('PK_TST'); jobmon_ident('PK_TST')]
+## Inputs
+0< [] 'TR_TST:LNK_PK.v'
+;
+
+#################################################################
+#### STAGE: TR_TST
+## Operator
+transform
+## Operator options
+-flag run
+-name 'V0S3_tst_api_job_TR_TST'
+-argvalue 'p_api_version=[&"p_api_version"]'
+
+## General options
+[ident('TR_TST'); jobmon_ident('TR_TST')]
+## Inputs
+0< [] 'RG_TST:LNK_TR.v'
+## Outputs
+0> [] 'TR_TST:LNK_PK.v'
+;
+
+
+=+=+=+=
+      IsTemplate "0"
+      NLSLocale ",,,,"
+      JobType "3"
+      Category "\\Jobs\\TST_API"
+      CenturyBreakYear "30"
+      NextAliasID "2"
+      ParameterFileDDName "DD00001"
+      ReservedWordCheck "1"
+      TransactionSize "0"
+      ValidationStatus "0"
+      Uploadable "0"
+      PgmCustomizationFlag "0"
+      JobReportFlag "0"
+      AllowMultipleInvocations "0"
+      Act2ActOverideDefaults "0"
+      Act2ActEnableRowBuffer "0"
+      Act2ActUseIPC "0"
+      Act2ActBufferSize "0"
+      Act2ActIPCTimeout "0"
+      ExpressionSemanticCheckFlag "0"
+      TraceOption "0"
+      EnableCacheSharing "0"
+      RuntimeColumnPropagation "0"
+      RelStagesInJobStatus "-1"
+      WebServiceEnabled "0"
+      MFProcessMetaData "0"
+      MFProcessMetaDataXMLFileExchangeMethod "0"
+      IMSProgType "0"
+      CopyLibPrefix "ARDT"
+      RecordPerformanceResults "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0"
+      OLEType "CContainerView"
+      Readonly "0"
+      Name "Job"
+      NextID "1"
+      IsTopLevel "0"
+      StageList "V0S0|V0S1|V0S3"
+      StageXPos "312|768|552"
+      StageYPos "192|192|192"
+      StageTypes "CCustomStage|CCustomStage|CTransformerStage"
+      NextStageID "5"
+      SnapToGrid "1"
+      GridLines "0"
+      ZoomValue "100"
+      StageXSize "48|48|48"
+      StageYSize "48|48|48"
+      ContainerViewSizing "0000 0000 1368 0496 0000 0001 0000 0000"
+      StageNames "RG_TST|PK_TST|TR_TST"
+      StageTypeIDs "PxRowGenerator|PxPeek|CTransformerStage"
+      LinkNames "LNK_TR| |LNK_PK"
+      LinkHasMetaDatas "True| |True"
+      LinkTypes "1| |1"
+      LinkNamePositionXs "440| |638"
+      LinkNamePositionYs "216| |223"
+      TargetStageIDs "V0S3| |V0S1"
+      SourceStageEffectiveExecutionModes "1| |2"
+      SourceStageRuntimeExecutionModes "1| |2"
+      TargetStageEffectiveExecutionModes "2| |2"
+      TargetStageRuntimeExecutionModes "2| |2"
+      LinkIsSingleOperatorLookup "False| |False"
+      LinkIsSortSequential "False| |False"
+      LinkSortMode "0| |0"
+      LinkPartColMode "1| |1"
+      LinkSourcePinIDs "V0S0P1| |V0S3P2"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S0"
+      OLEType "CCustomStage"
+      Readonly "0"
+      Name "RG_TST"
+      NextID "2"
+      OutputPins "V0S0P1"
+      StageType "PxRowGenerator"
+      AllowColumnMapping "0"
+      NextRecordID "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S0P1"
+      OLEType "CCustomOutput"
+      Readonly "0"
+      Name "LNK_TR"
+      Partner "V0S3|V0S3P1"
+      Properties "CCustomProperty"
+      BEGIN DSSUBRECORD
+         Name "schema"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "records"
+         Value "2"
+      END DSSUBRECORD
+      Columns "COutputColumn"
+      BEGIN DSSUBRECORD
+         Name "gen_x"
+         SqlType "4"
+         Precision "0"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "gen_y"
+         SqlType "4"
+         Precision "0"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "DiskWriteInc"
+         Value "1048576"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "BufFreeRun"
+         Value "50"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "MaxMemBufSize"
+         Value "3145728"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "QueueUpperSize"
+         Value "0"
+      END DSSUBRECORD
+      LeftTextPos "440"
+      TopTextPos "216"
+      LinkMinimised "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S1"
+      OLEType "CCustomStage"
+      Readonly "0"
+      Name "PK_TST"
+      NextID "3"
+      InputPins "V0S1P2"
+      StageType "PxPeek"
+      AllowColumnMapping "0"
+      Properties "CCustomProperty"
+      BEGIN DSSUBRECORD
+         Name "all"
+         Value " "
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "nrecs"
+         Value "10"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "dataset"
+         Value " "
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "name"
+         Value "name"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "columns"
+         Value " "
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "selection"
+         Value " "
+      END DSSUBRECORD
+      NextRecordID "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S1P2"
+      OLEType "CCustomInput"
+      Readonly "0"
+      Name "LNK_PK"
+      Partner "V0S3|V0S3P2"
+      LinkType "1"
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "RTColumnProp"
+         Value "0"
+      END DSSUBRECORD
+      TransactionSize "0"
+      TXNBehaviour "0"
+      EnableTxGroup "0"
+      LinkMinimised "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S3"
+      OLEType "CTransformerStage"
+      Readonly "0"
+      Name "TR_TST"
+      NextID "3"
+      InputPins "V0S3P1"
+      OutputPins "V0S3P2"
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TrxGenCode"
+         Value =+=+=+=
+//
+// Generated file to implement the V0S3_tst_api_job_TR_TEST transform operator.
+//
+
+// define our input/output link names
+inputname 0 LNK_TR;
+outputname 0 LNK_PK;
+
+global {
+	// Job parameter declaration
+	ustring p_api_version;
+}
+
+initialize {
+	// define our control variables
+	int8 RowRejected0;
+	int8 NullSetVar0;
+
+	// Stage variable declaration and initialisation
+	int32 StageVar0_APIVERSION;
+	StageVar0_APIVERSION = p_api_version;
+}
+
+mainloop {
+
+	// evaluate the stage variables first
+
+	// initialise the rejected row variable
+	RowRejected0 = 1;
+
+	// evaluate columns (no constraints) for link: LNK_PK
+	LNK_PK.api_version = StageVar0_APIVERSION;
+	writerecord 0;
+	RowRejected0 = 0;
+}
+
+finish {
+}
+
+=+=+=+=
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "JobParameterNames"
+         Value "p_api_version"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TrxGenCache"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TrxClassName"
+         Value "V0S3_tst_api_job_TR_TST"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TrxGenWarnings"
+         Value =+=+=+=
+TR_TST
+   WARNING: Error in Stage Variable initial value expression for variable APIVERSION. 
+       - potential data or precision loss converting from ustring to int32
+
+=+=+=+=
+      END DSSUBRECORD
+      ValidationStatus "0"
+      StageType "CTransformerStage"
+      BlockSize "0"
+      SKKeySourceType "file"
+      StageVars "CStageVar"
+      BEGIN DSSUBRECORD
+         Name "APIVERSION"
+         Description "IBM DataStage API version number"
+         InitialValue "p_api_version"
+         SqlType "4"
+         Precision "0"
+         ColScale "0"
+         ExtendedPrecision "0"
+      END DSSUBRECORD
+      StageVarsMinimised "0"
+      LoopVarsMaximised "0"
+      MaxLoopIterations "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S3P1"
+      OLEType "CTrxInput"
+      Readonly "0"
+      Name "LNK_TR"
+      Partner "V0S0|V0S0P1"
+      LinkType "1"
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "RTColumnProp"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "Schema"
+         Value =+=+=+=
+record
+(
+  gen_x:int32;
+  gen_y:int32;
+)
+=+=+=+=
+      END DSSUBRECORD
+      MultiRow "0"
+      LinkMinimised "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S3P2"
+      OLEType "CTrxOutput"
+      Readonly "0"
+      Name "LNK_PK"
+      Partner "V0S1|V0S1P2"
+      Reject "0"
+      ErrorPin "0"
+      RowLimit "0"
+      Columns "COutputColumn"
+      BEGIN DSSUBRECORD
+         Name "api_version"
+         SqlType "12"
+         Precision "0"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "APIVERSION"
+         Group "0"
+         ParsedDerivation "APIVERSION"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         StageVars "APIVERSION"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "gen_x"
+         SqlType "4"
+         Precision "0"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "LNK_TR.gen_x"
+         Group "0"
+         ParsedDerivation "LNK_TR.gen_x"
+         SourceColumn "LNK_TR.gen_x"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "gen_y"
+         SqlType "4"
+         Precision "0"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "LNK_TR.gen_y"
+         Group "0"
+         ParsedDerivation "LNK_TR.gen_y"
+         SourceColumn "LNK_TR.gen_y"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "Schema"
+         Value =+=+=+=
+record
+(
+  api_version:string[];
+  gen_x:int32;
+  gen_y:int32;
+)
+=+=+=+=
+      END DSSUBRECORD
+      LeftTextPos "638"
+      TopTextPos "223"
+      LinkMinimised "0"
+   END DSRECORD
+END DSJOB

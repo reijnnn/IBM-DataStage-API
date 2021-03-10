@@ -18,7 +18,7 @@ try:
     if err:
         raise Exception("Can't open the project {}: {}".format(DS_PROJECT, err))
 
-    DS_JOB_ID = 'job_id_1'
+    DS_JOB_ID = 'tst_api_job_id_1'
 
     print("Setting the id {} for the job {}".format(DS_JOB_ID, DS_JOB_NAME))
     res, err = dsapi.DSSetIdForJob(hproj, DS_JOB_NAME, DS_JOB_ID)

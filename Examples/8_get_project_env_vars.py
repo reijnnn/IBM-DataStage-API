@@ -18,16 +18,19 @@ try:
     if err:
         raise Exception("Can't open the project {}: {}".format(DS_PROJECT, err))
 
-    ENV_VAR_NAME = 'tst_env_var'
+    ENV_VAR_NAME = 'tst_api_env_var'
+    ENV_VAR_VALUE = 'tst_api_env_var_val'
 
     print("Adding the environment variable in the project")
     _, err = dsapi.DSAddEnvVar(hproj, ENV_VAR_NAME, dsapi.DSA_ENVVAR_TYPE_STRING,
-                               'Environment variable created with the API', 'value_123')
+                               'Environment variable created with the API', ENV_VAR_VALUE)
     if err:
         raise Exception("Can't add the environment variable in the project: {}".format(err))
 
+    ENV_VAR_VALUE = 'tst_api_env_var_val_edit'
+
     print("Editing the environment variable in the project")
-    _, err = dsapi.DSSetEnvVar(hproj, ENV_VAR_NAME, 'value_new_321')
+    _, err = dsapi.DSSetEnvVar(hproj, ENV_VAR_NAME, ENV_VAR_VALUE)
     if err:
         raise Exception("Can't edit the environment variable in the project: {}".format(err))
 
