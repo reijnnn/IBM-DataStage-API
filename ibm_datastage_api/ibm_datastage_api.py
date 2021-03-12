@@ -52,14 +52,14 @@ class DSAPI:
     DSJS_NOTRUNNING = 99  # Any other status
 
     # DSJOBINFO 'infoType' values
-    DSJ_JOBSTATUS = 1  # Current status of the job.
-    DSJ_JOBNAME = 2  # Name of the job referenced by JobHandle.
-    DSJ_JOBCONTROLLER = 3  # Name of job controlling the job referenced by JobHandle.
-    DSJ_JOBSTARTTIMESTAMP = 4  # Date and time when the job started.
-    DSJ_JOBWAVENO = 5  # Wave number of last or current run.
+    DSJ_JOBSTATUS = 1  # Current status of the job
+    DSJ_JOBNAME = 2  # Name of the job referenced by JobHandle
+    DSJ_JOBCONTROLLER = 3  # Name of job controlling the job referenced by JobHandle
+    DSJ_JOBSTARTTIMESTAMP = 4  # Date and time when the job started
+    DSJ_JOBWAVENO = 5  # Wave number of last or current run
     DSJ_PARAMLIST = 6  # List of job parameter names
     DSJ_STAGELIST = 7  # List of names of stages in job
-    DSJ_USERSTATUS = 8  # Value, if any,  set as the user status by the job.
+    DSJ_USERSTATUS = 8  # Value, if any, set as the user status by the job
     DSJ_JOBCONTROL = 9  # Job control STOP/SUSPEND/RESUME
     DSJ_JOBPID = 10  # Process id of DSD.RUN process
     DSJ_JOBLASTTIMESTAMP = 11  # Server date/time of job last finished: "YYYY-MM-DD HH:MM:SS"
@@ -67,7 +67,7 @@ class DSAPI:
     DSJ_JOBINTERIMSTATUS = 13  # Current interim status of job
     DSJ_JOBINVOCATIONID = 14  # Invocation name of the job referenced
     DSJ_JOBDESC = 15  # Job description
-    DSJ_STAGELIST2 = 16  # list of stages not in DSJ.STAGELIST
+    DSJ_STAGELIST2 = 16  # List of stages not in DSJ.STAGELIST
     DSJ_JOBELAPSED = 17  # Job Elapsed time in seconds
     DSJ_JOBEOTCOUNT = 18  # Count of EndOfTransmission blocks processed by this job so far
     DSJ_JOBEOTTIMESTAMP = 19  # Date/time of the last EndOfTransmission block processed by this job
@@ -81,39 +81,39 @@ class DSAPI:
     DSJ_PROJECTNAME = 2  # Name of current project
     DSJ_HOSTNAME = 3  # Host name of the server
     DSJ_INSTALLTAG = 4  # Install tag of the server DSEngine
-    DSJ_TCPPORT = 5  # TCP port    of the server DSEngine
+    DSJ_TCPPORT = 5  # TCP port of the server DSEngine
     DSJ_PROJECTPATH = 6  # Directory path of current project
 
     # DSSTAGEINFO 'infoType' values
     DSJ_LINKLIST = 1  # List of stage link names
-    DSJ_STAGELASTERR = 2  # Last error message reported from any link of the stage.
+    DSJ_STAGELASTERR = 2  # Last error message reported from any link of the stage
     DSJ_STAGENAME = 3  # Actual name of stage
-    DSJ_STAGETYPE = 4  # Stage type name.
-    DSJ_STAGEINROWNUM = 5  # Primary links input row number.
+    DSJ_STAGETYPE = 4  # Stage type name
+    DSJ_STAGEINROWNUM = 5  # Primary links input row number
     DSJ_VARLIST = 6  # List of stage variable names
     DSJ_STAGESTARTTIMESTAMP = 7  # Date and time when stage started
     DSJ_STAGEENDTIMESTAMP = 8  # Date and time when stage finished
     DSJ_STAGEDESC = 9  # Stage Description
-    DSJ_STAGEINST = 10  # Comma-seperated list of stage instance ids
-    DSJ_STAGECPU = 11  # Comma-seperated list of stage instance CPU in seconds
-    DSJ_LINKTYPES = 12  # Comma-seperated list of link types
+    DSJ_STAGEINST = 10  # Comma-separated list of stage instance ids
+    DSJ_STAGECPU = 11  # Comma-separated list of stage instance CPU in seconds
+    DSJ_LINKTYPES = 12  # Comma-separated list of link types
     DSJ_STAGEELAPSED = 13  # Stage elapsed time in seconds
-    DSJ_STAGEPID = 14  # Comma-seperated list of stage instance PIDs
+    DSJ_STAGEPID = 14  # Comma-separated list of stage instance PIDs
     DSJ_STAGESTATUS = 15  # Stage status
-    DSJ_STAGEEOTCOUNT = 16  # Count of EndOfTransmission blocks processed by this stage so far.
-    DSJ_STAGEEOTTIMESTAMP = 17  # Data/time of last EndOfTransmission block received by this stage.
+    DSJ_STAGEEOTCOUNT = 16  # Count of EndOfTransmission blocks processed by this stage so far
+    DSJ_STAGEEOTTIMESTAMP = 17  # Data/time of last EndOfTransmission block received by this stage
     DSJ_CUSTINFOLIST = 18  # List of custom info names
 
     # DSLINKINFO 'infoType' values
-    DSJ_LINKLASTERR = 1  # Last error message reported by link.
+    DSJ_LINKLASTERR = 1  # Last error message reported by link
     DSJ_LINKNAME = 2  # Actual name of link
-    DSJ_LINKROWCOUNT = 3  # Number of rows that have passed down the link.
+    DSJ_LINKROWCOUNT = 3  # Number of rows that have passed down the link
     DSJ_LINKSQLSTATE = 4  # SQLSTATE value from Last error message
     DSJ_LINKDBMSCODE = 5  # DBMSCODE value from Last error message
     DSJ_LINKDESC = 6  # Link description
     DSJ_LINKSTAGE = 7  # Stage at other end of link
-    DSJ_INSTROWCOUNT = 8  # Comma seperated list of rowcounts for each stage instance
-    DSJ_LINKEOTROWCOUNT = 9  # Row count since last EndOfTransmission block.
+    DSJ_INSTROWCOUNT = 8  # Comma-separated list of row counts for each stage instance
+    DSJ_LINKEOTROWCOUNT = 9  # Row count since last EndOfTransmission block
     DSJ_LINKEXTROWCOUNT = 10  # Extended rowcount, using strings
 
     # DSVARINFO 'infoType' values
@@ -125,31 +125,31 @@ class DSAPI:
     DSJ_CUSTINFODESC = 2  # Custom info description
 
     # DSLOGDETAILFULL 'eventType' values
-    DSJ_LOGINFO = 1  # Information message.
-    DSJ_LOGWARNING = 2  # Warning message.
-    DSJ_LOGFATAL = 3  # Fatal error message.
-    DSJ_LOGREJECT = 4  # Rejected row message.
-    DSJ_LOGSTARTED = 5  # Job started message.
-    DSJ_LOGRESET = 6  # Job reset message.
+    DSJ_LOGINFO = 1  # Information message
+    DSJ_LOGWARNING = 2  # Warning message
+    DSJ_LOGFATAL = 3  # Fatal error message
+    DSJ_LOGREJECT = 4  # Rejected row message
+    DSJ_LOGSTARTED = 5  # Job started message
+    DSJ_LOGRESET = 6  # Job reset message
     DSJ_LOGBATCH = 7  # Batch control
     DSJ_LOGOTHER = 98  # Category other than above
     DSJ_LOGANY = 99  # Any type of event
 
     # DSRUNJOB 'runMode' values
-    DSJ_RUNNORMAL = 1  # Standard job run.
-    DSJ_RUNRESET = 2  # Job is to be reset.
-    DSJ_RUNVALIDATE = 3  # Job is to be validated only.
-    DSJ_RUNRESTART = 4  # Restart job with previous parameters, job must be in Restartable state.
+    DSJ_RUNNORMAL = 1  # Standard job run
+    DSJ_RUNRESET = 2  # Job is to be reset
+    DSJ_RUNVALIDATE = 3  # Job is to be validated only
+    DSJ_RUNRESTART = 4  # Restart job with previous parameters, job must be in Restartable state
 
     # DSPARAM 'paramType' values
-    DSJ_PARAMTYPE_STRING = 0
-    DSJ_PARAMTYPE_ENCRYPTED = 1
-    DSJ_PARAMTYPE_INTEGER = 2
-    DSJ_PARAMTYPE_FLOAT = 3
-    DSJ_PARAMTYPE_PATHNAME = 4
-    DSJ_PARAMTYPE_LIST = 5
-    DSJ_PARAMTYPE_DATE = 6
-    DSJ_PARAMTYPE_TIME = 7
+    DSJ_PARAMTYPE_STRING = 0  # Character string
+    DSJ_PARAMTYPE_ENCRYPTED = 1  # Encrypted character string (for example, a password)
+    DSJ_PARAMTYPE_INTEGER = 2  # Integer
+    DSJ_PARAMTYPE_FLOAT = 3  # Floating-point number
+    DSJ_PARAMTYPE_PATHNAME = 4  # File system path name
+    DSJ_PARAMTYPE_LIST = 5  # Character string specifying one of the values from an enumerated list
+    DSJ_PARAMTYPE_DATE = 6  # Date in the format YYYY-MM-DD
+    DSJ_PARAMTYPE_TIME = 7  # Time in the format HH:MM:SS
 
     # DSREPORTINFO 'reportType' values
     DSJ_REPORT0 = 0  # Basic
@@ -157,19 +157,19 @@ class DSAPI:
     DSJ_REPORT2 = 2  # Text string containing full XML report
 
     # DSREPOSUSAGEJOB 'relationshipType' values
-    DSS_JOB_USES_JOB = 1
-    DSS_JOB_USEDBY_JOB = 2
-    DSS_JOB_HASSOURCE_TABLEDEF = 3
-    DSS_JOB_HASTARGET_TABLEDEF = 4
-    DSS_JOB_HASSOURCEORTARGET_TABLEDEF = 5
+    DSS_JOB_USES_JOB = 1  # List of jobs that the specified job uses
+    DSS_JOB_USEDBY_JOB = 2  # List of jobs the specified job is used by
+    DSS_JOB_HASSOURCE_TABLEDEF = 3  # List of jobs that use the specified table as a source
+    DSS_JOB_HASTARGET_TABLEDEF = 4  # List of jobs that use the specified table as a target
+    DSS_JOB_HASSOURCEORTARGET_TABLEDEF = 5  # List of jobs that use the specified table as a source or target
 
     # DSREPOSINFO 'infoType' values
     DSS_JOBS = 1  # The Object Type to return
-    DSS_JOB_ALL = 15  # list all jobs
-    DSS_JOB_SERVER = 1  # list all server jobs
-    DSS_JOB_PARALLEL = 2  # list all parallel jobs
-    DSS_JOB_MAINFRAME = 4  # list all mainframe jobs
-    DSS_JOB_SEQUENCE = 8  # list all sequence jobs
+    DSS_JOB_ALL = 15  # List all jobs
+    DSS_JOB_SERVER = 1  # List all server jobs
+    DSS_JOB_PARALLEL = 2  # List all parallel jobs
+    DSS_JOB_MAINFRAME = 4  # List all mainframe jobs
+    DSS_JOB_SEQUENCE = 8  # List all sequence jobs
 
     # DSAddEnvVar 'varType' values
     DSA_ENVVAR_TYPE_STRING = 'String'

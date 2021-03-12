@@ -15,3 +15,5 @@ venv/
 build/
 dist/
 *.egg-info
+
+Tests/
