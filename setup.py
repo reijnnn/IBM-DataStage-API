@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='IBM-DataStage-API',
-    version='1.0.0',
+    version='1.1.0',
     description='IBM DataStage API on python',
     classifiers=['Programming Language :: Python :: 3'],
     author='reijnnn',
